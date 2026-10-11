@@ -981,21 +981,18 @@
                 document.getElementById('input-monto').value = montoUSDC;
             }
 
-            // CORRECCIÓN DE TASA / PRECIO (SOPORTE PUNTO Y COMA)
             let tasaCalculada = 0;
             const matchPrecio = texto.match(/precio:\s*(\d{1,3}(\.\d{3})*(,\d+)?|\d+([.,]\d+)?)/i);
             
             if (matchPrecio) {
                 let rawP = matchPrecio[1].trim();
                 if (rawP.includes('.') && rawP.includes(',')) {
-                    // Formato latino con miles en punto y decimal en coma (Ej: 1.002,007)
                     rawP = rawP.replace(/\./g, '').replace(',', '.');
                 } else if (rawP.includes(',')) {
                     rawP = rawP.replace(',', '.');
                 }
                 tasaCalculada = parseFloat(rawP);
 
-                // Corrección de escala si detecta una tasa menor a 100 en VES
                 if (tasaCalculada < 100 && tasaCalculada > 0) {
                     let tasaNormalizada = parseFloat(rawP.replace('.', ''));
                     if (tasaNormalizada >= 100) {
@@ -1068,7 +1065,7 @@
                 const tipoUpper = (op.tipo || '').toUpperCase();
                 if (tipoUpper === 'VENTA') {
                     const nuevoLote = {
-                        idTag: 'L' + contadorLote + '(' + op.monto + ')',
+                        idTag: 'L' + contadorLote,
                         tasaVenta: op.tasa,
                         montoInicial: op.monto,
                         montoRestante: op.monto,
@@ -1263,7 +1260,11 @@
                 if (opTipoUpper === 'COMPRA') {
                     let gVes = op.gananciaVes || 0;
                     let gCripto = op.gananciaCripto || 0;
-                    gananciaHtml = `<div style="font-size:0.8rem; color: var(--accent-green); margin-top: 4px;">GANANCIA: <b>+${gVes.toFixed(2)} VES</b><br><span style="font-size:0.75rem;">+${gCripto.toFixed(4)} USDC</span></div>`;
+                    gananciaHtml = `
+                        <div style="font-size:0.8rem; color: var(--accent-green); margin-top: 6px; border-top: 1px dashed var(--card-border); padding-top: 4px;">
+                            GANANCIA: <b>+${gVes.toFixed(2)} VES</b><br>
+                            <span style="font-size:0.75rem; color: var(--text-muted);">≈ +${gCripto.toFixed(4)} USDC</span>
+                        </div>`;
                 }
 
                 html += `
@@ -1287,7 +1288,7 @@
                             </div>
                             <div>
                                 <div style="color: var(--text-muted); font-size: 0.7rem;">TASA</div>
-                                <div style="font-weight: bold; font-size: 0.9rem;">${op.tasa.toFixed(3)}</div>
+                                <div style="font-weight: bold; font-size: 0.9rem;">${op.tasa.toFixed(2)}</div>
                             </div>
                             <div>
                                 <div style="color: var(--text-muted); font-size: 0.7rem;">LOTE</div>
