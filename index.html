@@ -337,7 +337,7 @@
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Ajustes</h3>
         <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px;">
             <div style="font-weight: bold; margin-bottom: 5px;">Comisión y Motor de Lotes</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Todas las tarjetas y lotes responden a la fecha seleccionada.</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Métricas sincronizadas por fecha de operación.</div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -1024,12 +1024,10 @@
         }
 
         function actualizarDashboard() {
-            // Operaciones exclusivamente del día seleccionado en el header
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
             const comprasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
             const ventasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
 
-            // Ganancias del día
             const gananciaDiaCripto = comprasDia.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
             const gananciaDiaVes = comprasDia.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
 
@@ -1041,7 +1039,6 @@
             document.getElementById('meta-diaria-progreso').innerText = `${gananciaDiaCripto.toFixed(2)} / ${metaDiariaUSDC.toFixed(2)} USDC (Meta Día)`;
             document.getElementById('meta-diaria-pct').innerText = pctMeta.toFixed(0) + '%';
 
-            // Promedios, brecha y cantidad de operaciones del día
             const promCompra = comprasDia.length > 0 ? comprasDia.reduce((acc, op) => acc + op.tasa, 0) / comprasDia.length : 0;
             const promVenta = ventasDia.length > 0 ? ventasDia.reduce((acc, op) => acc + op.tasa, 0) / ventasDia.length : 0;
             
@@ -1050,17 +1047,14 @@
                 brecha = ((promVenta - promCompra) / promCompra) * 100;
             }
 
-            // Lotes Activos creados EN LA FECHA SELECCIONADA
             const lotesAbiertosDia = lotes.filter(l => l.fecha === fechaActualStr && l.estado === 'ABIERTO').length;
 
-            // Pendientes del día seleccionado
             const totalRecompraPendienteDia = lotes.filter(l => l.fecha === fechaActualStr && l.estado === 'ABIERTO').reduce((acc, l) => acc + l.montoRestante, 0);
             const totalComprasCriptoDia = comprasDia.reduce((acc, op) => acc + op.monto, 0);
             const totalVentasCriptoDia = ventasDia.reduce((acc, op) => acc + op.monto, 0);
             const totalReventaPendienteDia = Math.max(0, totalComprasCriptoDia - totalVentasCriptoDia);
             const totalPendientesUSDCDia = totalRecompraPendienteDia + totalReventaPendienteDia;
 
-            // Actualización de métricas en pantalla
             document.getElementById('dash-prom-compra').innerText = promCompra.toFixed(2);
             document.getElementById('dash-prom-venta').innerText = promVenta.toFixed(2);
             document.getElementById('dash-brecha').innerText = brecha.toFixed(2) + "%";
