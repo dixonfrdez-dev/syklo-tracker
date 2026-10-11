@@ -859,7 +859,7 @@
             const monto = parseFloat(document.getElementById('input-monto').value) || 0;
             const tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
             const comisionCripto = parseFloat(document.getElementById('input-comision-cripto').value) || 0;
-            const tipo = document.getElementById('input-tipo').value;
+            const tipo = document.getElementById('input-tipo').value.toUpperCase();
             const metodo = document.getElementById('input-metodo').value;
             
             const montoEfectivoCripto = monto - comisionCripto;
@@ -1000,7 +1000,7 @@
             const usuario = document.getElementById('input-usuario').value || 'N/A';
             const referencia = document.getElementById('input-ref').value || 'N/A';
             const estatus = document.getElementById('input-estatus').value;
-            const tipo = document.getElementById('input-tipo').value;
+            const tipo = document.getElementById('input-tipo').value.toUpperCase();
             const metodo = document.getElementById('input-metodo').value;
             const monto = parseFloat(document.getElementById('input-monto').value);
             const tasa = parseFloat(document.getElementById('input-tasa').value);
@@ -1056,7 +1056,8 @@
             const opsAsc = [...operaciones].sort((a, b) => a.id - b.id);
 
             opsAsc.forEach(op => {
-                if (op.tipo === 'VENTA') {
+                const tipoUpper = (op.tipo || '').toUpperCase();
+                if (tipoUpper === 'VENTA') {
                     const nuevoLote = {
                         idTag: 'L' + contadorLote + '(' + op.monto + ')',
                         tasaVenta: op.tasa,
@@ -1071,7 +1072,7 @@
                     op.lote = nuevoLote.idTag;
                     op.gananciaVes = 0;
                     op.gananciaCripto = 0;
-                } else if (op.tipo === 'COMPRA') {
+                } else if (tipoUpper === 'COMPRA') {
                     let loteAbierto = lotesActivos.find(l => l.estado === 'ABIERTO');
                     if (loteAbierto) {
                         op.lote = loteAbierto.idTag;
@@ -1100,7 +1101,7 @@
 
         function actualizarDashboard() {
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
-            const comprasDia = opsDelDia.filter(op => op.tipo === 'COMPRA');
+            const comprasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
 
             const gananciaDiaCripto = comprasDia.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
             let gananciaDiaVes = 0;
@@ -1114,8 +1115,8 @@
             document.getElementById('meta-diaria-progreso').innerText = `${gananciaDiaCripto.toFixed(2)} / ${metaDiariaUSDC.toFixed(2)} USDC (Meta Día)`;
             document.getElementById('meta-diaria-pct').innerText = pctMeta.toFixed(0) + '%';
 
-            const comprasTotales = operaciones.filter(op => op.tipo === 'COMPRA');
-            const ventasTotales = operaciones.filter(op => op.tipo === 'VENTA');
+            const comprasTotales = operaciones.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
+            const ventasTotales = operaciones.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
 
             const promCompra = comprasTotales.length > 0 ? comprasTotales.reduce((acc, op) => acc + op.tasa, 0) / comprasTotales.length : 0;
             const promVenta = ventasTotales.length > 0 ? ventasTotales.reduce((acc, op) => acc + op.tasa, 0) / ventasTotales.length : 0;
@@ -1131,7 +1132,7 @@
             const lotesAbiertos = lotes.filter(l => l.estado === 'ABIERTO').length;
 
             const totalRecompraPendiente = lotes.filter(l => l.estado === 'ABIERTO').reduce((acc, l) => acc + l.montoRestante, 0);
-            const reventaPendienteOps = operaciones.filter(op => op.estatus === 'En Curso' && op.tipo === 'VENTA');
+            const reventaPendienteOps = operaciones.filter(op => op.estatus === 'En Curso' && (op.tipo || '').toUpperCase() === 'VENTA');
             const totalReventaPendiente = reventaPendienteOps.reduce((acc, op) => acc + op.monto, 0);
             const totalPendientesUSDC = totalRecompraPendiente + totalReventaPendiente;
 
@@ -1150,7 +1151,7 @@
         }
 
         function actualizarCalculosResumenGanancias() {
-            const opsHoy = operaciones.filter(op => op.fecha === fechaActualStr && op.tipo === 'COMPRA');
+            const opsHoy = operaciones.filter(op => op.fecha === fechaActualStr && (op.tipo || '').toUpperCase() === 'COMPRA');
             const gHoyVes = opsHoy.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gHoyUsdc = opsHoy.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
 
@@ -1161,7 +1162,7 @@
             const opsSemana = operaciones.filter(op => {
                 if(!op.fecha) return false;
                 const dOp = new Date(op.fecha + 'T00:00:00');
-                return dOp >= inicioSemana && dOp <= fechaRef && op.tipo === 'COMPRA';
+                return dOp >= inicioSemana && dOp <= fechaRef && (op.tipo || '').toUpperCase() === 'COMPRA';
             });
             const gSemVes = opsSemana.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gSemUsdc = opsSemana.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
@@ -1170,7 +1171,7 @@
             const opsMes = operaciones.filter(op => {
                 if(!op.fecha) return false;
                 const [yOp, mOp] = op.fecha.split('-');
-                return yOp === yRef && mOp === mRef && op.tipo === 'COMPRA';
+                return yOp === yRef && mOp === mRef && (op.tipo || '').toUpperCase() === 'COMPRA';
             });
             const gMesVes = opsMes.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gMesUsdc = opsMes.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
@@ -1187,7 +1188,7 @@
 
         function actualizarContenidoPendientes() {
             const lotesAbiertos = lotes.filter(l => l.estado === 'ABIERTO');
-            const reventaPendienteOps = operaciones.filter(op => op.estatus === 'En Curso' && op.tipo === 'VENTA');
+            const reventaPendienteOps = operaciones.filter(op => op.estatus === 'En Curso' && (op.tipo || '').toUpperCase() === 'VENTA');
 
             const totalRecompra = lotesAbiertos.reduce((acc, l) => acc + l.montoRestante, 0);
             const totalReventa = reventaPendienteOps.reduce((acc, op) => acc + op.monto, 0);
@@ -1206,12 +1207,13 @@
 
         function filtrarHistorial() {
             const q = document.getElementById('busqueda-filtro').value.toLowerCase();
-            const tipoFiltro = document.getElementById('filtro-tipo').value;
+            const tipoFiltro = document.getElementById('filtro-tipo').value.toUpperCase();
             const metodoFiltro = document.getElementById('filtro-metodo').value;
 
             const filtradas = operaciones.filter(op => {
                 const matchQ = op.usuario.toLowerCase().includes(q) || op.referencia.toLowerCase().includes(q);
-                const matchTipo = (tipoFiltro === 'Todas' || op.tipo === tipoFiltro);
+                const opTipoUpper = (op.tipo || '').toUpperCase();
+                const matchTipo = (tipoFiltro === 'TODAS' || opTipoUpper === tipoFiltro);
                 const matchMetodo = (metodoFiltro === 'Todos' || op.metodo === metodoFiltro);
                 return matchQ && matchTipo && matchMetodo;
             });
@@ -1228,10 +1230,11 @@
 
             let html = '';
             lista.forEach(op => {
-                const bTipo = op.tipo === 'COMPRA' ? 'badge-compra' : 'badge-venta';
+                const opTipoUpper = (op.tipo || '').toUpperCase();
+                const bTipo = opTipoUpper === 'COMPRA' ? 'badge-compra' : 'badge-venta';
                 let gananciaHtml = '';
                 
-                if (op.tipo === 'COMPRA') {
+                if (opTipoUpper === 'COMPRA') {
                     let gVes = op.gananciaVes || 0;
                     let gCripto = op.gananciaCripto || 0;
                     gananciaHtml = `<div style="font-size:0.8rem; color: var(--accent-green); margin-top: 4px;">GANANCIA: <b>+${gVes.toFixed(2)} VES</b><br><span style="font-size:0.75rem;">+${gCripto.toFixed(4)} USDC</span></div>`;
@@ -1244,7 +1247,7 @@
                                 <strong style="font-size: 0.9rem;">${op.usuario}</strong>
                                 <div style="font-size: 0.75rem; color: var(--text-muted);">${op.metodo} · Syklo</div>
                             </div>
-                            <div><span class="badge ${bTipo}">${op.tipo}</span></div>
+                            <div><span class="badge ${bTipo}">${opTipoUpper}</span></div>
                         </div>
 
                         <div class="op-details-grid">
