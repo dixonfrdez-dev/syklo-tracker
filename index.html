@@ -421,7 +421,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                 <div class="form-group">
                     <label>Tasa de Cambio</label>
-                    <input type="number" id="input-tasa" step="0.001" placeholder="0.000" oninput="calcularTotalesModal()">
+                    <input type="number" id="input-tasa" step="0.0001" placeholder="0.0000" oninput="calcularTotalesModal()">
                 </div>
                 <div class="form-group">
                     <label>Monto Cripto</label>
@@ -455,7 +455,7 @@
             </div>
 
             <button type="button" class="btn-pegado" onclick="ejecutarPegadoEspecial()">📋 Pegado Especial</button>
-            <button class="btn-submit" onclick="guardarOperacion()">Guardar</button>
+            <button type="button" class="btn-submit" onclick="guardarOperacion()">Guardar</button>
         </div>
     </div>
 
@@ -761,27 +761,34 @@
                 document.getElementById('input-monto').value = montoUSDC;
             }
 
-            let tasaCalculada = 0;
-            const matchPrecio = texto.match(/precio:\s*(\d{1,3}(\.\d{3})*(,\d+)?|\d+([.,]\d+)?)/i);
-            
-            if (matchPrecio) {
-                let rawP = matchPrecio[1].trim();
-                if (rawP.includes('.') && rawP.includes(',')) {
-                    rawP = rawP.replace(/\./g, '').replace(',', '.');
-                } else if (rawP.includes(',')) {
-                    rawP = rawP.replace(',', '.');
-                }
-                tasaCalculada = parseFloat(rawP);
+            // Extracción exacta de Monto Recibido en VES si existe para calcular la tasa exacta
+            let montoBsExtraido = 0;
+            const matchRecibidoVES = texto.match(/monto recibido:\s*([\d\.,]+)\s*VES/i);
+            const matchEnviadoVES = texto.match(/monto enviado:\s*([\d\.,]+)\s*VES/i);
+            if (matchRecibidoVES) {
+                montoBsExtraido = parseFloat(matchRecibidoVES[1].replace(/\./g, '').replace(',', '.'));
+            } else if (matchEnviadoVES) {
+                montoBsExtraido = parseFloat(matchEnviadoVES[1].replace(/\./g, '').replace(',', '.'));
+            }
 
-                if (tasaCalculada < 100 && tasaCalculada > 0) {
-                    let tasaNormalizada = parseFloat(rawP.replace('.', ''));
-                    if (tasaNormalizada >= 100) {
-                        tasaCalculada = tasaNormalizada / 1000;
+            let tasaCalculada = 0;
+            if (montoBsExtraido > 0 && montoUSDC > 0) {
+                tasaCalculada = montoBsExtraido / montoUSDC;
+            } else {
+                const matchPrecio = texto.match(/precio:\s*(\d{1,3}(\.\d{3})*(,\d+)?|\d+([.,]\d+)?)/i);
+                if (matchPrecio) {
+                    let rawP = matchPrecio[1].trim();
+                    if (rawP.includes('.') && rawP.includes(',')) {
+                        rawP = rawP.replace(/\./g, '').replace(',', '.');
+                    } else if (rawP.includes(',')) {
+                        rawP = rawP.replace(',', '.');
                     }
+                    tasaCalculada = parseFloat(rawP);
                 }
             }
+
             if (tasaCalculada > 0) {
-                document.getElementById('input-tasa').value = tasaCalculada.toFixed(3);
+                document.getElementById('input-tasa').value = tasaCalculada.toFixed(4);
             }
 
             calcularTotalesModal();
@@ -902,7 +909,6 @@
             mostrarToast("✓ Orden actualizado. Recalculando...");
         }
 
-        // MOTOR FIFO: ORDENAMIENTO CRONOLÓGICO INVERTIDO (DE MÁS ANTIGUO A MÁS RECIENTE)
         function recalcularLotesMotor() {
             let lotesActivos = [];
             let contadorLote = 1;
@@ -915,7 +921,6 @@
                 op.lotesConsumidos = [];
             });
 
-            // Procesar estrictamente del más antiguo al más reciente (cronológico)
             const opsCronologico = [...operaciones].reverse();
 
             opsCronologico.forEach(op => {
