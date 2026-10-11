@@ -718,7 +718,6 @@
 
         function procesarTextoInteligente(texto) {
             const textoLower = texto.toLowerCase();
-            const lineas = texto.split('\n').map(l => l.trim()).filter(l => l !== '');
             
             let esCompra = true;
             if (textoLower.includes('monto enviado')) {
