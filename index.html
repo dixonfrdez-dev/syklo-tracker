@@ -119,6 +119,7 @@
             width: 100%; padding: 9px; background-color: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; color: white; box-sizing: border-box; font-size: 0.85rem; margin-top: 4px;
         }
 
+        /* TARJETAS IDÉNTICAS A LA CAPTURA DE TU PRIMO */
         .op-card-item {
             background-color: #121722; border: 1px solid var(--card-border); border-radius: 14px; padding: 14px; margin-bottom: 12px; cursor: pointer; position: relative;
         }
@@ -146,6 +147,9 @@
             display: inline-flex; align-items: center; gap: 4px; background: rgba(0, 230, 118, 0.1); border: 1px solid rgba(0, 230, 118, 0.3);
             color: var(--accent-green); padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;
         }
+
+        .lote-badge-cerrado { color: var(--accent-green); font-weight: bold; font-size: 0.75rem; }
+        .lote-badge-abierto { color: var(--accent-orange); font-weight: bold; font-size: 0.75rem; background: rgba(255, 145, 0, 0.15); border: 1px solid var(--accent-orange); padding: 2px 6px; border-radius: 6px; display: inline-block; margin-top: 4px; }
 
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -902,7 +906,7 @@
             mostrarToast("✓ Orden actualizado. Recalculando...");
         }
 
-        // MOTOR RECALCULADOR DE LOTES MULTI-LOTE EXACTO COMO EN LA CAPTURA
+        // MOTOR FIFO EXACTO: VENTA ABRE LOTE, COMPRA CIERRA LOTE MÁS ANTIGUO ABIERTO PRIMERO
         function recalcularLotesMotor() {
             let lotesActivos = [];
             let contadorLote = 1;
@@ -916,24 +920,23 @@
                         tasaVenta: op.tasa,
                         montoInicial: op.monto,
                         montoRestante: op.monto,
-                        estado: 'ABIERTO',
-                        ref: op.referencia,
-                        usuario: op.usuario
+                        estado: 'ABIERTO'
                     };
                     contadorLote++;
                     lotesActivos.push(nuevoLote);
+                    op.loteObj = nuevoLote;
                     op.loteTag = nuevoLote.idTag;
-                    op.lotesDesglose = [];
                     op.gananciaVes = 0;
                     op.gananciaCripto = 0;
                 } else if (tipoUpper === 'COMPRA') {
                     let montoPorCubrir = op.monto;
                     let gananciaVesTotal = 0;
                     let gananciaUsdcTotal = 0;
-                    let desgloses = [];
+                    let lotePrincipalAsignado = null;
 
                     for (let lote of lotesActivos) {
                         if (lote.estado === 'ABIERTO' && montoPorCubrir > 0) {
+                            if (!lotePrincipalAsignado) lotePrincipalAsignado = lote;
                             let asignado = Math.min(lote.montoRestante, montoPorCubrir);
                             let difTasa = lote.tasaVenta - op.tasa;
                             let gVes = difTasa * asignado;
@@ -945,8 +948,6 @@
                             lote.montoRestante -= asignado;
                             montoPorCubrir -= asignado;
 
-                            desgloses.push(`${lote.idTag}(${asignado.toFixed(2)})`);
-
                             if (lote.montoRestante <= 0.001) {
                                 lote.estado = 'CERRADO';
                             }
@@ -955,8 +956,8 @@
 
                     op.gananciaVes = gananciaVesTotal;
                     op.gananciaCripto = gananciaUsdcTotal;
-                    op.lotesDesglose = desgloses;
-                    op.loteTag = desgloses.length > 0 ? desgloses.join(', ') : 'L-SIN_LOTE';
+                    op.loteObj = lotePrincipalAsignado;
+                    op.loteTag = lotePrincipalAsignado ? lotePrincipalAsignado.idTag : 'N/A';
                 }
             });
 
@@ -1118,6 +1119,17 @@
                 const classTag = esVenta ? 'tag-venta' : 'tag-compra';
                 const inicialUser = (op.usuario || 'U').charAt(0).toUpperCase();
 
+                let estadoLoteHtml = '';
+                if (op.loteObj) {
+                    if (op.loteObj.estado === 'CERRADO') {
+                        estadoLoteHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span class="lote-badge-cerrado">(Cerrado)</span>`;
+                    } else {
+                        estadoLoteHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <div class="lote-badge-abierto">(Abierto: Falta ${op.loteObj.montoRestante.toFixed(2)} USDC)</div>`;
+                    }
+                } else {
+                    estadoLoteHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">N/A</span>`;
+                }
+
                 let gananciaVes = op.gananciaVes || 0;
                 let gananciaUsdc = op.gananciaCripto || 0;
 
@@ -1156,7 +1168,7 @@
 
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed var(--card-border); padding-top: 8px;">
                             <div style="font-size: 0.72rem; color: var(--text-muted);">
-                                REF: <span style="color: #cbd5e1;">${op.referencia}</span> · LOTE: <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag || 'N/A'}</span>
+                                REF: <span style="color: #cbd5e1;">${op.referencia}</span> · ${estadoLoteHtml}
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px;" onclick="event.stopPropagation()">
                                 <button onclick="pedirConfirmacionMover(${op.id}, 'arriba')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem;" title="Subir">⬆️</button>
@@ -1203,7 +1215,7 @@
                     </div>
                 </div>
 
-                <div class="op-grid-2x2" style="background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 12px;">
+                <div class="op-grid-2x2" style="background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
                     <div>
                         <div class="op-grid-col-label">MONTO USDC</div>
                         <div class="op-grid-col-val">${op.monto.toFixed(3)}</div>
