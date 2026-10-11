@@ -649,6 +649,7 @@
 
         function calcularComisionBancaria(tipoOp, metodoOp, montoBsVal) {
             let comision = 0.0;
+            // Se asegura que aplique si es COMPRA y el método contiene pago móvil (independientemente de cómo esté escrito)
             if (tipoOp === 'COMPRA' && esPagoMovil(metodoOp)) {
                 let calculoPorcentaje = montoBsVal * 0.003;
                 comision = Math.max(14.0, calculoPorcentaje);
@@ -727,25 +728,21 @@
             
             let esCompra = true;
 
-            // Detección precisa basada en palabras clave comunes de P2P
-            if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('enviado:')) {
+            // Detección mejorada de tipo de operación basada en las cadenas del portapapeles
+            if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('venta')) {
                 esCompra = false;
-            }
-            if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('recibido:')) {
-                // Validar si el recibido es VES (Compra) o USDC (Venta)
+            } else if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('compra')) {
+                esCompra = true;
+            } else {
+                // Validación secundaria basada en flujos de recibido/enviado si no hay palabras clave directas
                 if (textoLower.includes('monto recibido:') && textoLower.includes('usdc') && !textoLower.includes('ves')) {
                     esCompra = false;
+                } else if (textoLower.includes('monto recibido:') && textoLower.includes('ves')) {
+                    esCompra = true;
                 }
             }
 
-            // Detección directa por signos o modismos del portapapeles
-            if (textoLower.includes('venta') || textoLower.includes('has vendido')) {
-                esCompra = false;
-            } else if (textoLower.includes('compra') || textoLower.includes('has comprado')) {
-                esCompra = true;
-            }
-
-            // Asignar el valor al selector del modal
+            // Asignar automáticamente el tipo de operación detectado
             document.getElementById('input-tipo').value = esCompra ? 'COMPRA' : 'VENTA';
 
             let usuarioEncontrado = "";
@@ -836,6 +833,7 @@
                     vesManual = monto * (tasa > 0 ? tasa : 1);
                 }
 
+                // Cálculo definitivo incluyendo comisión bancaria si es compra por Pagomóvil
                 let totalBsFinal = 0;
                 if (tipo === 'COMPRA') {
                     let comisionBancaria = calcularComisionBancaria(tipo, metodo, vesManual);
