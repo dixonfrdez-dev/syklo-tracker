@@ -807,14 +807,14 @@
                 let unidadEnviada = matchEnviado[2].toUpperCase();
                 let unidadRecibida = matchRecibido[2].toUpperCase();
                 
-                if (unidadEnviada.includes('USDC') || unidadEnviada.includes('USD')) {
+                if (unidadEnviada.includes('VES') || unidadEnviada.includes('BS')) {
+                    esCompra = true;
+                } else if (unidadEnviada.includes('USDC') || unidadEnviada.includes('USD')) {
                     esCompra = false;
-                } else if (unidadEnviada.includes('VES') || unidadEnviada.includes('BS')) {
-                    esCompra = true;
-                } else if (unidadRecibida.includes('USDC') || unidadRecibida.includes('USD')) {
-                    esCompra = true;
                 } else if (unidadRecibida.includes('VES') || unidadRecibida.includes('BS')) {
                     esCompra = false;
+                } else {
+                    esCompra = true;
                 }
             } else {
                 if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('venta')) {
