@@ -281,8 +281,8 @@
             </div>
         </div>
 
-        <button type="button" class="btn-analisis" onclick="abrirAnalisisSemanal()">📊 Análisis Semanal VES</button>
-        <button type="button" class="btn-analisis" onclick="abrirAnalisisMensual()">📊 Análisis Mensual VES</button>
+        <button type="button" class="btn-analisis">📊 Análisis Semanal VES</button>
+        <button type="button" class="btn-analisis">📊 Análisis Mensual VES</button>
     </div>
 
     <!-- VISTA 2: RESUMEN VES -->
@@ -329,9 +329,7 @@
     <!-- VISTA 4: RATINGS -->
     <div id="view-ratings" class="view-section">
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Calificaciones de Contrapartes</h3>
-        <div id="ratings-container">
-            <div style="text-align: center; color: var(--text-muted); padding: 40px;">Sin calificaciones aún.</div>
-        </div>
+        <div style="text-align: center; color: var(--text-muted); padding: 40px;">Sin calificaciones aún.</div>
     </div>
 
     <!-- VISTA 5: AJUSTES -->
@@ -521,28 +519,6 @@
         </div>
     </div>
 
-    <!-- MODAL ANÁLISIS SEMANAL -->
-    <div class="modal" id="modal-analisis-semanal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; color: var(--neon-blue); font-size: 1.1rem;">📊 Análisis Semanal VES</h3>
-                <button type="button" onclick="document.getElementById('modal-analisis-semanal').style.display='none'" class="btn-modal-close">✕</button>
-            </div>
-            <div id="contenido-analisis-semanal" style="font-size: 0.9rem; color: var(--text-color);">Cargando...</div>
-        </div>
-    </div>
-
-    <!-- MODAL ANÁLISIS MENSUAL -->
-    <div class="modal" id="modal-analisis-mensual">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; color: var(--neon-blue); font-size: 1.1rem;">📊 Análisis Mensual VES</h3>
-                <button type="button" onclick="document.getElementById('modal-analisis-mensual').style.display='none'" class="btn-modal-close">✕</button>
-            </div>
-            <div id="contenido-analisis-mensual" style="font-size: 0.9rem; color: var(--text-color);">Cargando...</div>
-        </div>
-    </div>
-
     <!-- MODAL PENDIENTES -->
     <div class="modal" id="modal-pendientes">
         <div class="modal-content">
@@ -626,55 +602,6 @@
             document.getElementById('modal-pendientes').style.display = 'none';
         }
 
-        function abrirAnalisisSemanal() {
-            const fechaRef = new Date(fechaActualStr + 'T00:00:00');
-            const inicioSemana = new Date(fechaRef);
-            inicioSemana.setDate(fechaRef.getDate() - 6);
-
-            const opsSemana = operaciones.filter(op => {
-                if(!op.fecha) return false;
-                const dOp = new Date(op.fecha + 'T00:00:00');
-                return dOp >= inicioSemana && dOp <= fechaRef;
-            });
-
-            const comprasSemana = opsSemana.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
-            const totalVes = comprasSemana.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
-            const totalUsdc = comprasSemana.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
-
-            document.getElementById('contenido-analisis-semanal').innerHTML = `
-                <div style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px; text-align: center; margin-bottom: 12px;">
-                    <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">ÚLTIMOS 7 DÍAS</div>
-                    <div style="font-size:1.3rem; font-weight:bold; color:var(--accent-green);">${totalVes.toFixed(2)} VES</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">≈ ${totalUsdc.toFixed(4)} USDC</div>
-                </div>
-                <div style="font-size: 0.85rem; color: var(--text-muted);">Total de operaciones en el periodo: <b>${opsSemana.length}</b></div>
-            `;
-            document.getElementById('modal-analisis-semanal').style.display = 'flex';
-        }
-
-        function abrirAnalisisMensual() {
-            const [yRef, mRef] = fechaActualStr.split('-');
-            const opsMes = operaciones.filter(op => {
-                if(!op.fecha) return false;
-                const [yOp, mOp] = op.fecha.split('-');
-                return yOp === yRef && mOp === mRef;
-            });
-
-            const comprasMes = opsMes.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
-            const totalVes = comprasMes.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
-            const totalUsdc = comprasMes.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
-
-            document.getElementById('contenido-analisis-mensual').innerHTML = `
-                <div style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px; text-align: center; margin-bottom: 12px;">
-                    <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">MES ${mRef}/${yRef}</div>
-                    <div style="font-size:1.3rem; font-weight:bold; color:var(--accent-green);">${totalVes.toFixed(2)} VES</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">≈ ${totalUsdc.toFixed(4)} USDC</div>
-                </div>
-                <div style="font-size: 0.85rem; color: var(--text-muted);">Total de operaciones en el mes: <b>${opsMes.length}</b></div>
-            `;
-            document.getElementById('modal-analisis-mensual').style.display = 'flex';
-        }
-
         function abrirCalendario() {
             const inputDate = document.getElementById('input-fecha-calendario');
             inputDate.value = fechaActualStr;
@@ -722,6 +649,7 @@
 
         function calcularComisionBancaria(tipoOp, metodoOp, montoBsVal) {
             let comision = 0.0;
+            // Se valida robustamente si es COMPRA y el método es Pago Móvil
             if (tipoOp === 'COMPRA' && esPagoMovil(metodoOp)) {
                 let calculoPorcentaje = montoBsVal * 0.003;
                 comision = Math.max(14.0, calculoPorcentaje);
@@ -800,6 +728,7 @@
             
             let esCompra = true;
 
+            // Detección automática precisa basada en los campos copiados de Syklo
             const matchEnviado = textoLower.match(/monto enviado:\s*([\d\.,]+)\s*([a-z]+/i);
             const matchRecibido = textoLower.match(/monto recibido:\s*([\d\.,]+)\s*([a-z]+/i);
 
@@ -807,16 +736,19 @@
                 let unidadEnviada = matchEnviado[2].toUpperCase();
                 let unidadRecibida = matchRecibido[2].toUpperCase();
                 
+                // Si envías VES (Bolívares) y recibes USDC, es una COMPRA.
+                // Si envías USDC y recibes VES, es una VENTA.
                 if (unidadEnviada.includes('VES') || unidadEnviada.includes('BS')) {
                     esCompra = true;
                 } else if (unidadEnviada.includes('USDC') || unidadEnviada.includes('USD')) {
                     esCompra = false;
                 } else if (unidadRecibida.includes('VES') || unidadRecibida.includes('BS')) {
-                    esCompra = false;
+                    esCompra = false; // Recibes VES porque vendiste cripto
                 } else {
                     esCompra = true;
                 }
             } else {
+                // Respaldos por palabras clave directas
                 if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('venta')) {
                     esCompra = false;
                 } else if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('compra')) {
@@ -824,6 +756,7 @@
                 }
             }
 
+            // Asignar automáticamente el tipo de operación detectado
             document.getElementById('input-tipo').value = esCompra ? 'COMPRA' : 'VENTA';
 
             let usuarioEncontrado = "";
@@ -914,6 +847,7 @@
                     vesManual = monto * (tasa > 0 ? tasa : 1);
                 }
 
+                // Cálculo definitivo sumando la comisión bancaria si es Compra y usa Pago Móvil
                 let totalBsFinal = 0;
                 if (tipo === 'COMPRA') {
                     let comisionBancaria = calcularComisionBancaria(tipo, metodo, vesManual);
@@ -1095,7 +1029,6 @@
             });
 
             lotes = lotesActivos;
-            actualizarRatings();
         }
 
         function actualizarDashboard() {
@@ -1214,46 +1147,6 @@
             }
 
             document.getElementById('lista-reventa-pendientes').innerHTML = htmlReventa;
-        }
-
-        function actualizarRatings() {
-            const container = document.getElementById('ratings-container');
-            const usuariosMap = {};
-            
-            operaciones.forEach(op => {
-                if(op.usuario && op.usuario !== 'N/A') {
-                    if(!usuariosMap[op.usuario]) {
-                        usuariosMap[op.usuario] = { totalOps: 0, completadas: 0 };
-                    }
-                    usuariosMap[op.usuario].totalOps++;
-                    if(op.estatus === 'Completado') {
-                        usuariosMap[op.usuario].completadas++;
-                    }
-                }
-            });
-
-            const keys = Object.keys(usuariosMap);
-            if(keys.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px;">Sin calificaciones aún.</div>`;
-                return;
-            }
-
-            let html = '';
-            keys.forEach(usr => {
-                const data = usuariosMap[usr];
-                html += `
-                    <div class="neon-card" style="padding: 12px; margin-bottom: 8px; cursor: default;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-weight:bold; font-size:0.95rem;">${usr}</span>
-                            <span style="color:var(--accent-green); font-size:0.85rem; font-weight:bold;">5.0 ★</span>
-                        </div>
-                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">
-                            Operaciones registradas: <b>${data.totalOps}</b> (${data.completadas} completadas)
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
         }
 
         function filtrarHistorial() {
