@@ -798,7 +798,7 @@
             calcularTotalesModal();
         }
 
-        function calcularTotalesModal() {
+                function calcularTotalesModal() {
             const monto = parseFloat(document.getElementById('input-monto').value) || 0;
             let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
             const comisionCripto = parseFloat(document.getElementById('input-comision-cripto').value) || 0;
@@ -815,11 +815,17 @@
                 montoBs = montoEfectivoCripto * tasa;
             }
             
+            // Calcula la comisión bancaria (solo aplica para COMPRA y Pagomóvil)
             let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBs);
-            let total = (tipo === 'COMPRA') ? (montoBs + comisionBancaria) : (vesManual > 0 ? vesManual : montoBs);
+            
+            // Resta la comisión bancaria solo si es COMPRA por Pagomóvil; en ventas u otros métodos queda intacto
+            let total = montoBs;
+            if (tipo === 'COMPRA' && esPagoMovil(metodo)) {
+                total = montoBs - comisionBancaria;
+            }
 
             document.getElementById('modal-monto-bs').innerText = montoBs.toFixed(2);
-            document.getElementById('modal-comision').innerText = comisionBancaria.toFixed(2);
+            document.getElementById('modal-comision').innerText = (tipo === 'COMPRA' && esPagoMovil(metodo) ? "-" : "") + comisionBancaria.toFixed(2);
             document.getElementById('modal-comision-cripto-txt').innerText = comisionCripto.toFixed(2) + " USDC";
             document.getElementById('modal-total').innerText = total.toFixed(2);
         }
