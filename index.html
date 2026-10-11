@@ -77,7 +77,7 @@
             height: 0;
         }
 
-        /* TARJETAS CON BORDE SUPERIOR NEÓN Y TRÉBOL SUTIL */
+        /* TARJETAS NEÓN Y CARDS DE RESUMEN */
         .neon-card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -91,7 +91,6 @@
             cursor: pointer;
         }
 
-        /* GANANCIA DEL DÍA */
         .ganancia-title {
             font-size: 0.78rem;
             color: var(--text-muted);
@@ -142,33 +141,17 @@
             margin-top: 4px;
         }
 
-        /* GANANCIAS CRIPTO / USD GRID */
         .crypto-usd-container {
             display: flex;
             justify-content: space-around;
             align-items: center;
             margin-top: 6px;
         }
-        .crypto-item {
-            text-align: center;
-        }
-        .val-crypto-orange {
-            font-size: 1.45rem;
-            font-weight: 800;
-            color: var(--accent-orange);
-        }
-        .val-usd-purple {
-            font-size: 1.45rem;
-            font-weight: 800;
-            color: var(--accent-purple);
-        }
-        .label-unit {
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-left: 2px;
-        }
+        .crypto-item { text-align: center; }
+        .val-crypto-orange { font-size: 1.45rem; font-weight: 800; color: var(--accent-orange); }
+        .val-usd-purple { font-size: 1.45rem; font-weight: 800; color: var(--accent-purple); }
+        .label-unit { font-size: 0.9rem; font-weight: 700; margin-left: 2px; }
 
-        /* META OP Y CAPITAL INICIAL */
         .meta-card-row {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -180,7 +163,6 @@
             align-items: center;
         }
 
-        /* MÉTRICAS CON ICONOS GRANDES TRANSLÚCIDOS */
         .metrics-grid-2x3 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -199,31 +181,12 @@
             justify-content: center;
             min-height: 70px;
         }
-        .metric-title {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-            font-weight: 600;
-            z-index: 2;
-        }
-        .metric-value {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #fff;
-            z-index: 2;
-        }
+        .metric-title { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; z-index: 2; }
+        .metric-value { font-size: 1.15rem; font-weight: 800; color: #fff; z-index: 2; }
         .metric-big-icon {
-            position: absolute;
-            right: -8px;
-            bottom: -10px;
-            font-size: 3.2rem;
-            opacity: 0.12;
-            z-index: 1;
-            pointer-events: none;
-            user-select: none;
+            position: absolute; right: -8px; bottom: -10px; font-size: 3.2rem; opacity: 0.12; z-index: 1; pointer-events: none; user-select: none;
         }
 
-        /* BOTONES DE ANÁLISIS */
         .btn-analisis {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -242,36 +205,19 @@
             gap: 8px;
         }
 
-        /* FAB (+) FLOTANTE */
         .fab {
-            position: fixed;
-            bottom: 74px;
-            right: 18px;
+            position: fixed; bottom: 74px; right: 18px;
             background: linear-gradient(135deg, #2979ff, #00b0ff);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            font-size: 28px;
+            color: white; border: none; border-radius: 50%;
+            width: 56px; height: 56px; font-size: 28px;
             box-shadow: 0 6px 16px rgba(0, 176, 255, 0.4);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100;
         }
 
-        /* BARRA INFERIOR */
         .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%;
-            background-color: #0c1017;
-            border-top: 1px solid var(--card-border);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0 10px 0;
-            z-index: 90;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: #0c1017; border-top: 1px solid var(--card-border);
+            display: flex; justify-content: space-around; padding: 8px 0 10px 0; z-index: 90;
         }
         .nav-item {
             background: none; border: none; color: #64748b;
@@ -281,92 +227,79 @@
         .nav-item.active { color: var(--neon-blue); font-weight: 700; }
         .nav-item span { font-size: 1.15rem; }
 
-        /* MODAL Y VISTAS */
         .filter-bar {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 12px;
+            background-color: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 14px; padding: 12px; margin-bottom: 12px;
         }
         .filter-bar input, .filter-bar select, .modal input, .modal select {
-            width: 100%;
-            padding: 9px;
-            background-color: var(--bg-color);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            color: white;
-            box-sizing: border-box;
-            font-size: 0.85rem;
-            margin-top: 4px;
+            width: 100%; padding: 9px; background-color: var(--bg-color);
+            border: 1px solid var(--card-border); border-radius: 8px;
+            color: white; box-sizing: border-box; font-size: 0.85rem; margin-top: 4px;
         }
+
+        /* DISEÑO FIEL A LA CAPTURA PARA LAS TARJETAS */
         .op-card-item {
-            background-color: var(--card-bg);
+            background-color: #121722;
             border: 1px solid var(--card-border);
             border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
             cursor: pointer;
+            position: relative;
         }
-        .op-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
+        .op-card-item.type-venta { border-left: 4px solid var(--accent-red); }
+        .op-card-item.type-compra { border-left: 4px solid var(--accent-green); }
+
+        .avatar-circle {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.85rem; color: #fff;
         }
-        .op-details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            font-size: 0.85rem;
-            background: var(--bg-color);
-            padding: 8px;
-            border-radius: 8px;
-            border: 1px solid var(--card-border);
-            margin-bottom: 6px;
+        .avatar-venta { background-color: rgba(255, 82, 82, 0.2); border: 1px solid var(--accent-red); color: var(--accent-red); }
+        .avatar-compra { background-color: rgba(0, 230, 118, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); }
+
+        .tag-tipo {
+            font-size: 0.7rem; font-weight: 800; padding: 3px 10px; border-radius: 12px; letter-spacing: 0.5px;
         }
-        .badge { padding: 3px 7px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; }
-        .badge-compra { background-color: rgba(0, 230, 118, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
-        .badge-venta { background-color: rgba(255, 82, 82, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+        .tag-venta { background-color: rgba(255, 82, 82, 0.15); color: var(--accent-red); }
+        .tag-compra { background-color: rgba(0, 230, 118, 0.15); color: var(--accent-green); }
+
+        .op-grid-2x2 {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; margin-bottom: 8px;
+        }
+        .op-grid-col-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .op-grid-col-val { font-size: 1.05rem; font-weight: 800; color: #fff; margin-top: 2px; }
+
+        .ganancia-val-green { font-size: 1.05rem; font-weight: 800; color: var(--accent-green); margin-top: 2px; }
+        .ganancia-sub-usdc { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: rgba(0, 230, 118, 0.1); border: 1px solid rgba(0, 230, 118, 0.3);
+            color: var(--accent-green); padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;
+        }
+        .lote-badge-status {
+            font-size: 0.7rem; font-weight: 700; border-radius: 4px; padding: 2px 6px; margin-left: 6px;
+        }
+        .lote-abierto { background: rgba(255, 145, 0, 0.2); color: var(--accent-orange); border: 1px solid var(--accent-orange); }
+        .lote-cerrado { background: rgba(0, 230, 118, 0.15); color: var(--accent-green); }
 
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.85);
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 1000;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85); justify-content: center; align-items: flex-end; z-index: 1000;
         }
         .modal-content {
-            background-color: #121722;
-            width: 100%;
-            max-width: 500px;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            padding: 20px;
-            border-top: 1px solid var(--card-border);
-            box-sizing: border-box;
-            max-height: 90vh;
-            overflow-y: auto;
+            background-color: #121722; width: 100%; max-width: 500px;
+            border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px;
+            border-top: 1px solid var(--card-border); box-sizing: border-box; max-height: 90vh; overflow-y: auto;
         }
         .btn-modal-close {
-            background: #1e2638;
-            border: none;
-            color: #8492a6;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            cursor: pointer;
+            background: #1e2638; border: none; color: #8492a6; width: 28px; height: 28px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; cursor: pointer;
         }
         .btn-submit {
-            background: linear-gradient(135deg, #2979ff, #00b0ff);
-            color: white; border: none; width: 100%; padding: 13px;
-            border-radius: 8px; font-weight: 700; font-size: 1rem; margin-top: 10px; cursor: pointer;
+            background: linear-gradient(135deg, #2979ff, #00b0ff); color: white; border: none;
+            width: 100%; padding: 13px; border-radius: 8px; font-weight: 700; font-size: 1rem; margin-top: 10px; cursor: pointer;
         }
         .btn-pegado {
             background-color: #1a2232; border: 1px solid var(--card-border); color: #c9d1d9;
@@ -374,13 +307,11 @@
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
         }
 
-        /* TOAST NOTIFICACIÓN */
         #toast-aviso {
-            position: fixed; top: 15px; left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background-color: var(--accent-green); color: #000;
-            padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 800;
-            box-shadow: 0 4px 15px rgba(0,230,118,0.4); transition: transform 0.3s ease; z-index: 3000;
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background-color: var(--accent-green); color: #000; padding: 10px 20px; border-radius: 30px;
+            font-size: 0.85rem; font-weight: 800; box-shadow: 0 4px 15px rgba(0,230,118,0.4);
+            transition: transform 0.3s ease; z-index: 3000;
         }
         #toast-aviso.show { transform: translateX(-50%) translateY(0); }
     </style>
@@ -392,7 +323,6 @@
     <!-- VISTA 1: DASHBOARD -->
     <div id="view-dashboard" class="view-section active">
         
-        <!-- TOP HEADER CON TRÉBOL DE LA SUERTE -->
         <div class="top-header">
             <div class="user-profile">
                 <div class="user-icon">👤</div>
@@ -406,15 +336,11 @@
             </div>
         </div>
 
-        <!-- TARJETA 1: GANANCIA DEL DÍA -->
         <div class="neon-card" onclick="abrirModalResumenGanancias()">
-            <div class="ganancia-title">
-                📈 GANANCIA DEL DÍA
-            </div>
+            <div class="ganancia-title">📈 GANANCIA DEL DÍA</div>
             <div class="val-usdc-main" id="dash-ganancia-dia-usdc">0.0000 <span style="font-size: 1.1rem;">USDC</span></div>
             <div class="val-ves-sub" id="dash-ganancia-dia-ves">0.00 VES</div>
             
-            <!-- BARRITA DE META DIARIA -->
             <div class="progress-bar-container">
                 <div class="progress-bar-fill" id="meta-diaria-fill"></div>
             </div>
@@ -422,16 +348,11 @@
                 <span id="meta-diaria-progreso">0.00 / 10.00 USDC (Meta Día)</span>
                 <span id="meta-diaria-pct">0%</span>
             </div>
-
-            <!-- TRÉBOL SUTIL TRANSLÚCIDO DE FONDO -->
-            <div style="position: absolute; right: -5px; bottom: -10px; font-size: 4rem; opacity: 0.12; pointer-events: none; user-select: none;">🍀</div>
+            <div style="position: absolute; right: -5px; bottom: -10px; font-size: 4rem; opacity: 0.12; pointer-events: none;">🍀</div>
         </div>
 
-        <!-- TARJETA 2: GANANCIAS CRIPTO/USD -->
         <div class="neon-card" style="padding: 14px;">
-            <div class="ganancia-title" style="margin-bottom: 8px;">
-                💲 GANANCIAS CRIPTO/USD
-            </div>
+            <div class="ganancia-title" style="margin-bottom: 8px;">💲 GANANCIAS CRIPTO/USD</div>
             <div class="crypto-usd-container">
                 <div class="crypto-item">
                     <span class="val-crypto-orange" id="dash-ganancia-cripto">0.00</span>
@@ -445,7 +366,6 @@
             <div style="position: absolute; right: -5px; bottom: -10px; font-size: 4rem; opacity: 0.1; pointer-events: none;">🪙</div>
         </div>
 
-        <!-- TARJETA 3: META OP -->
         <div class="meta-card-row">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="font-size: 1.5rem; background: rgba(41, 121, 255, 0.15); padding: 8px 12px; border-radius: 10px; color: var(--primary-blue);">🎯</div>
@@ -457,7 +377,6 @@
             <div style="background: #1e293b; padding: 5px 12px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; color: #94a3b8;" id="txt-meta-pct">0%</div>
         </div>
 
-        <!-- TARJETA 4: CAPITAL INICIAL -->
         <div class="neon-card" style="padding: 14px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -467,12 +386,11 @@
                         <div style="font-size: 0.72rem; color: var(--text-muted);">Saldo registrado del día</div>
                     </div>
                 </div>
-                <button onclick="editarCapital()" style="background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: #e2e8f0; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">✏️ Editar</button>
+                <button onclick="editarCapital()" style="background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: #e2e8f0; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600;">✏️ Editar</button>
             </div>
             <div style="font-size: 0.82rem; color: var(--text-muted); margin-left: 54px;" id="txt-capital">No hay capital registrado para hoy.</div>
         </div>
 
-        <!-- GRID DE 6 MÉTRICAS -->
         <div class="metrics-grid-2x3">
             <div class="metric-card-item">
                 <span class="metric-title">Prom. Compra</span>
@@ -486,7 +404,7 @@
             </div>
             <div class="metric-card-item">
                 <span class="metric-title">Brecha</span>
-                <span class="metric-value" id="dash-brecha" style="color: #fff;">0.00%</span>
+                <span class="metric-value" id="dash-brecha">0.00%</span>
                 <span class="metric-big-icon" style="color: var(--accent-orange);">⚡</span>
             </div>
             <div class="metric-card-item">
@@ -501,7 +419,7 @@
             </div>
             <div class="metric-card-item" onclick="abrirModalPendientes()" style="cursor: pointer;">
                 <span class="metric-title">Pendientes</span>
-                <span class="metric-value" id="dash-pendientes" style="color: #fff;">0.00 USDC</span>
+                <span class="metric-value" id="dash-pendientes">0.00 USDC</span>
                 <span class="metric-big-icon" style="color: var(--neon-blue);">⏳</span>
             </div>
         </div>
@@ -577,7 +495,7 @@
     <!-- BOTÓN (+) FLOTANTE -->
     <button class="fab" onclick="abrirModalNuevaOp()">+</button>
 
-    <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+    <!-- BARRA INFERIOR -->
     <div class="bottom-nav">
         <button class="nav-item active" onclick="cambiarVista('dashboard', this)">
             <span>📊</span>Dashboard
@@ -697,14 +615,12 @@
         </div>
     </div>
 
-    <!-- MODAL DETALLE DE OPERACIÓN (FIFO / LOTES) -->
+    <!-- MODAL DETALLE DE OPERACIÓN -->
     <div class="modal" id="modal-detalle-op">
-        <div class="modal-content" id="contenido-detalle-op">
-            <!-- Contenido dinámico -->
-        </div>
+        <div class="modal-content" id="contenido-detalle-op"></div>
     </div>
 
-    <!-- MODAL RESUMEN DE GANANCIAS -->
+    <!-- MODAL RESUMEN GANANCIAS -->
     <div class="modal" id="modal-resumen-ganancias">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -716,19 +632,19 @@
             </div>
 
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">🔆 HOY</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">HOY</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-hoy-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-hoy-usdc">0.0000 USDC</div>
             </div>
 
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">📅 ESTA SEMANA</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">ESTA SEMANA</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-sem-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-sem-usdc">0.0000 USDC</div>
             </div>
 
             <div class="neon-card" style="margin-bottom: 4px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">🗓️ ESTE MES</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">ESTE MES</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-mes-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-mes-usdc">0.0000 USDC</div>
             </div>
@@ -1117,12 +1033,14 @@
                     };
                     contadorLote++;
                     lotesActivos.push(nuevoLote);
+                    op.loteObj = nuevoLote;
                     op.lote = nuevoLote.idTag;
                     op.gananciaVes = 0;
                     op.gananciaCripto = 0;
                 } else if (tipoUpper === 'COMPRA') {
                     let loteAbierto = lotesActivos.find(l => l.estado === 'ABIERTO');
                     if (loteAbierto) {
+                        op.loteObj = loteAbierto;
                         op.lote = loteAbierto.idTag;
                         
                         let diferenciaTasa = loteAbierto.tasaVenta - op.tasa;
@@ -1138,6 +1056,7 @@
                         }
                     } else {
                         op.lote = 'L-SIN_LOTE';
+                        op.loteObj = null;
                         op.gananciaVes = 0;
                         op.gananciaCripto = 0;
                     }
@@ -1296,64 +1215,68 @@
             let html = '';
             lista.forEach(op => {
                 const opTipoUpper = (op.tipo || '').toUpperCase();
-                const bTipo = opTipoUpper === 'COMPRA' ? 'badge-compra' : 'badge-venta';
-                let gananciaHtml = '';
-                
-                if (opTipoUpper === 'COMPRA') {
-                    let gVes = op.gananciaVes || 0;
-                    let gCripto = op.gananciaCripto || 0;
-                    gananciaHtml = `
-                        <div style="font-size:0.8rem; color: var(--accent-green); margin-top: 6px; border-top: 1px dashed var(--card-border); padding-top: 4px;">
-                            GANANCIA: <b>+${gVes.toFixed(2)} VES</b><br>
-                            <span style="font-size:0.75rem; color: var(--text-muted);">≈ +${gCripto.toFixed(4)} USDC</span>
-                        </div>`;
+                const esVenta = opTipoUpper === 'VENTA';
+                const classType = esVenta ? 'type-venta' : 'type-compra';
+                const classAvatar = esVenta ? 'avatar-venta' : 'avatar-compra';
+                const classTag = esVenta ? 'tag-venta' : 'tag-compra';
+                const inicialUser = (op.usuario || 'U').charAt(0).toUpperCase();
+
+                // LOTE Y ESTADO ABIERTO / CERRADO
+                let loteInfoHtml = '';
+                if (op.loteObj) {
+                    if (op.loteObj.estado === 'ABIERTO') {
+                        loteInfoHtml = `<span class="lote-badge-status lote-abierto">Lote ${op.lote} (Abierto: Falta ${op.loteObj.montoRestante.toFixed(2)} USDC)</span>`;
+                    } else {
+                        loteInfoHtml = `<span class="lote-badge-status lote-cerrado">Lote ${op.lote} (Cerrado)</span>`;
+                    }
                 } else {
-                    let gVes = op.gananciaVes || 0;
-                    let gCripto = op.gananciaCripto || 0;
-                    gananciaHtml = `
-                        <div style="font-size:0.8rem; color: var(--accent-green); margin-top: 6px; border-top: 1px dashed var(--card-border); padding-top: 4px;">
-                            GANANCIA: <b>+${gVes.toFixed(2)} VES</b><br>
-                            <span style="font-size:0.75rem; color: var(--text-muted);">≈ +${gCripto.toFixed(4)} USDC</span>
-                        </div>`;
+                    loteInfoHtml = `<span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 6px;">Lote: ${op.lote || 'N/A'}</span>`;
                 }
 
+                let gananciaVes = op.gananciaVes || 0;
+                let gananciaUsdc = op.gananciaCripto || 0;
+
                 html += `
-                    <div class="op-card-item" onclick="abrirDetalleOp(${op.id})">
-                        <div class="op-header-row">
-                            <div>
-                                <strong style="font-size: 0.9rem;">${op.usuario}</strong>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">${op.metodo} · Syklo</div>
+                    <div class="op-card-item ${classType}" onclick="abrirDetalleOp(${op.id})">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="avatar-circle ${classAvatar}">${inicialUser}</div>
+                                <div>
+                                    <div style="font-size: 0.95rem; font-weight: 800; color: #fff;">${op.usuario} <span style="color: var(--accent-orange); font-size: 0.8rem;">5.0 ★</span></div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted);">${op.metodo} ➔ Syklo</div>
+                                </div>
                             </div>
-                            <div><span class="badge ${bTipo}">${opTipoUpper}</span></div>
+                            <span class="tag-tipo ${classTag}">${opTipoUpper}</span>
                         </div>
 
-                        <div class="op-details-grid">
+                        <div class="op-grid-2x2">
                             <div>
-                                <div style="color: var(--text-muted); font-size: 0.7rem;">MONTO USDC</div>
-                                <div style="font-weight: bold; font-size: 0.9rem;">${op.monto.toFixed(3)}</div>
+                                <div class="op-grid-col-label">MONTO USDC</div>
+                                <div class="op-grid-col-val">${op.monto.toFixed(3)}</div>
                             </div>
                             <div>
-                                <div style="color: var(--text-muted); font-size: 0.7rem;">MONTO BS</div>
-                                <div style="font-weight: bold; font-size: 0.9rem;">${op.montoBs.toFixed(2)}</div>
+                                <div class="op-grid-col-label">MONTO BS</div>
+                                <div class="op-grid-col-val">${op.montoBs.toFixed(2)}</div>
                             </div>
                             <div>
-                                <div style="color: var(--text-muted); font-size: 0.7rem;">TASA</div>
-                                <div style="font-weight: bold; font-size: 0.9rem;">${op.tasa.toFixed(2)}</div>
+                                <div class="op-grid-col-label">TASA</div>
+                                <div class="op-grid-col-val">${op.tasa.toFixed(2)}</div>
                             </div>
                             <div>
-                                <div style="color: var(--text-muted); font-size: 0.7rem;">LOTE</div>
-                                <div style="font-weight: bold; font-size: 0.85rem; color: var(--neon-blue);">${op.lote || 'N/A'}</div>
+                                <div class="op-grid-col-label">GANANCIA</div>
+                                <div class="ganancia-val-green">+${gananciaVes.toFixed(2)} <span style="font-size: 0.7rem;">VES</span></div>
+                                <div class="ganancia-sub-usdc">≈ +${gananciaUsdc.toFixed(2)} USDC</div>
                             </div>
                         </div>
 
-                        ${gananciaHtml}
-
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">
-                            <span>REF: ${op.referencia} · ${op.fecha}</span>
-                            <div style="display: flex; gap: 10px; align-items: center;" onclick="event.stopPropagation()">
-                                <span class="badge badge-compra">${op.estatus}</span>
-                                <button onclick="editarOp(${op.id})" style="background:none; border:none; color:var(--neon-blue); cursor:pointer; font-size:0.9rem;" title="Editar">✏️</button>
-                                <button onclick="eliminarOp(${op.id})" style="background:none; border:none; color:var(--accent-red); cursor:pointer; font-size:0.9rem;" title="Eliminar">🗑️</button>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed var(--card-border); padding-top: 8px;">
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">
+                                REF: <span style="color: #cbd5e1;">${op.referencia}</span> ${loteInfoHtml}
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation()">
+                                <span class="status-pill">● ${op.estatus}</span>
+                                <button onclick="editarOp(${op.id})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;" title="Editar">✏️</button>
+                                <button onclick="eliminarOp(${op.id})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;" title="Eliminar">🗑️</button>
                             </div>
                         </div>
                     </div>
@@ -1369,6 +1292,13 @@
             const opTipoUpper = (op.tipo || '').toUpperCase();
             const colorTipo = opTipoUpper === 'COMPRA' ? 'var(--accent-green)' : 'var(--accent-red)';
 
+            let loteEstadoTxt = 'N/A';
+            if (op.loteObj) {
+                loteEstadoTxt = op.loteObj.estado === 'ABIERTO' ? 
+                    `<b style="color: var(--accent-orange);">ABIERTO</b> (Falta recomprar/cerrar: <b>${op.loteObj.montoRestante.toFixed(2)} USDC</b>)` : 
+                    `<b style="color: var(--accent-green);">CERRADO</b>`;
+            }
+
             document.getElementById('contenido-detalle-op').innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3 style="margin: 0; color: #fff; font-size: 1.1rem;">📄 Detalle de Operación</h3>
@@ -1379,7 +1309,7 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <span style="font-size: 1rem; font-weight: bold;">${op.usuario}</span>
                         <div style="display:flex; gap:8px; align-items:center;">
-                            <span class="badge" style="background:${colorTipo}20; color:${colorTipo}; border:1px solid ${colorTipo};">${opTipoUpper}</span>
+                            <span class="tag-tipo" style="background:${colorTipo}20; color:${colorTipo};">${opTipoUpper}</span>
                             <button onclick="editarOp(${op.id})" style="background:#1e2638; border:1px solid var(--card-border); color:var(--neon-blue); padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">✏️ Editar</button>
                         </div>
                     </div>
@@ -1393,23 +1323,28 @@
                     </div>
                 </div>
 
-                <div class="op-details-grid" style="margin-bottom: 12px;">
+                <div class="op-grid-2x2" style="background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 12px;">
                     <div>
-                        <div style="color: var(--text-muted); font-size: 0.7rem;">MONTO USDC</div>
-                        <div style="font-weight: bold; font-size: 0.95rem;">${op.monto.toFixed(3)}</div>
+                        <div class="op-grid-col-label">MONTO USDC</div>
+                        <div class="op-grid-col-val">${op.monto.toFixed(3)}</div>
                     </div>
                     <div>
-                        <div style="color: var(--text-muted); font-size: 0.7rem;">MONTO BS</div>
-                        <div style="font-weight: bold; font-size: 0.95rem;">${op.montoBs.toFixed(2)}</div>
+                        <div class="op-grid-col-label">MONTO BS</div>
+                        <div class="op-grid-col-val">${op.montoBs.toFixed(2)}</div>
                     </div>
                     <div>
-                        <div style="color: var(--text-muted); font-size: 0.7rem;">TASA</div>
-                        <div style="font-weight: bold; font-size: 0.95rem;">${op.tasa.toFixed(2)}</div>
+                        <div class="op-grid-col-label">TASA</div>
+                        <div class="op-grid-col-val">${op.tasa.toFixed(2)}</div>
                     </div>
                     <div>
-                        <div style="color: var(--text-muted); font-size: 0.7rem;">LOTE</div>
-                        <div style="font-weight: bold; font-size: 0.95rem; color: var(--neon-blue);">${op.lote || 'N/A'}</div>
+                        <div class="op-grid-col-label">LOTE</div>
+                        <div class="op-grid-col-val" style="color: var(--neon-blue);">${op.lote || 'N/A'}</div>
                     </div>
+                </div>
+
+                <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; font-size: 0.82rem;">
+                    <div style="margin-bottom: 6px; color: var(--text-muted); font-weight: 700;">ESTADO DEL LOTE EN FIFO:</div>
+                    <div>Estado actual: ${loteEstadoTxt}</div>
                 </div>
             `;
 
