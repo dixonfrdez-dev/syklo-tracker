@@ -726,30 +726,26 @@
             const textoLower = texto.toLowerCase();
             
             let esCompra = true;
-            if (textoLower.includes('monto enviado')) {
-                let indexEnviado = textoLower.indexOf('monto enviado');
-                let fragmentoEnviado = textoLower.substring(indexEnviado, indexEnviado + 40);
-                if (fragmentoEnviado.includes('usdc')) {
+
+            // Detección precisa basada en palabras clave comunes de P2P
+            if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('enviado:')) {
+                esCompra = false;
+            }
+            if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('recibido:')) {
+                // Validar si el recibido es VES (Compra) o USDC (Venta)
+                if (textoLower.includes('monto recibido:') && textoLower.includes('usdc') && !textoLower.includes('ves')) {
                     esCompra = false;
-                } else if (fragmentoEnviado.includes('ves')) {
-                    esCompra = true;
-                }
-            } else if (textoLower.includes('monto recibido')) {
-                let indexRecibido = textoLower.indexOf('monto recibido');
-                let fragmentoRecibido = textoLower.substring(indexRecibido, indexRecibido + 40);
-                if (fragmentoRecibido.includes('ves')) {
-                    esCompra = false;
-                } else if (fragmentoRecibido.includes('usdc')) {
-                    esCompra = true;
                 }
             }
 
-            if (textoLower.includes('has vendido') || /-\s*\d+/.test(texto)) {
+            // Detección directa por signos o modismos del portapapeles
+            if (textoLower.includes('venta') || textoLower.includes('has vendido')) {
                 esCompra = false;
-            } else if (textoLower.includes('has comprado') || /\+\s*\d+/.test(texto)) {
+            } else if (textoLower.includes('compra') || textoLower.includes('has comprado')) {
                 esCompra = true;
             }
 
+            // Asignar el valor al selector del modal
             document.getElementById('input-tipo').value = esCompra ? 'COMPRA' : 'VENTA';
 
             let usuarioEncontrado = "";
