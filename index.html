@@ -768,35 +768,16 @@
             const m = metodoStr.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             return m.includes("pagomovil") || m.includes("pago movil");
         }
-
         function calcularComisionBancaria(tipoOp, metodoOp, montoBsVal) {
             let comision = 0.0;
             if (tipoOp === 'COMPRA' && esPagoMovil(metodoOp)) {
+                // Aplica el porcentaje de comisión del banco (0.3% o ajusta el factor según corresponda)
                 let calculoPorcentaje = montoBsVal * 0.003;
-                comision = Math.max(14.0, calculoPorcentaje);
+                comision = Math.max(14.0, calculoPorcentaje); // Ejemplo con mínimo de 14 VES
             }
             return comision;
         }
 
-        function alCambiarMontoVESManual() {
-            const montoVesManual = parseFloat(document.getElementById('input-monto-ves-manual').value) || 0;
-            const montoUSDC = parseFloat(document.getElementById('input-monto').value) || 0;
-
-            if (montoVesManual > 0 && montoUSDC > 0) {
-                const tasaCalc = montoVesManual / montoUSDC;
-                document.getElementById('input-tasa').value = tasaCalc.toFixed(6);
-            }
-            calcularTotalesModal();
-        }
-
-        function alCambiarTasaOUSDC() {
-            let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
-            const montoUSDC = parseFloat(document.getElementById('input-monto').value) || 0;
-            if (tasa > 0 && montoUSDC > 0) {
-                document.getElementById('input-monto-ves-manual').value = (tasa * montoUSDC).toFixed(2);
-            }
-            calcularTotalesModal();
-        }
         function calcularTotalesModal() {
             const monto = parseFloat(document.getElementById('input-monto').value) || 0;
             let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
@@ -814,18 +795,21 @@
                 montoBs = montoEfectivoCripto * tasa;
             }
             
-            // Mantenemos la comisión bancaria visualmente en 0 para que no altere el monto ingresado
-            let comisionBancaria = 0.0;
+            let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBs);
+            
+            // Suma la comisión bancaria al total en las compras por pago móvil
             let total = montoBs;
+            if (tipo === 'COMPRA' && esPagoMovil(metodo)) {
+                total = montoBs + comisionBancaria;
+            }
 
             document.getElementById('modal-monto-bs').innerText = montoBs.toFixed(2);
             document.getElementById('modal-comision').innerText = comisionBancaria.toFixed(2);
             document.getElementById('modal-comision-cripto-txt').innerText = comisionCripto.toFixed(2) + " USDC";
             document.getElementById('modal-total').innerText = total.toFixed(2);
-        
-
         }
 
+        
         async function ejecutarPegadoEspecial() {
             try {
                 if (navigator.clipboard && navigator.clipboard.readText) {
