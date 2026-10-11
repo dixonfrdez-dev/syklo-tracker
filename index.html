@@ -467,7 +467,7 @@
                 </div>
                 <hr style="border-color: var(--card-border); margin: 6px 0;">
                 <div style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--neon-blue); font-weight: bold;">⊙ Total Final VES:</span>
+                    <span style="color: var(--neon-blue); font-weight: bold;">⊙ Total a Debitar:</span>
                     <span id="modal-total" style="font-weight: bold; color: var(--neon-blue);">0.00</span>
                 </div>
             </div>
@@ -716,9 +716,7 @@
                     try {
                         inputDate.showPicker();
                         return;
-                    } catch (e) {
-                        // Fallback si el navegador restringe showPicker
-                    }
+                    } catch (e) {}
                 }
                 inputDate.click();
             }
@@ -768,14 +766,34 @@
             const m = metodoStr.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             return m.includes("pagomovil") || m.includes("pago movil");
         }
+
         function calcularComisionBancaria(tipoOp, metodoOp, montoBsVal) {
             let comision = 0.0;
             if (tipoOp === 'COMPRA' && esPagoMovil(metodoOp)) {
-                // Aplica el porcentaje de comisión del banco (0.3% o ajusta el factor según corresponda)
                 let calculoPorcentaje = montoBsVal * 0.003;
-                comision = Math.max(14.0, calculoPorcentaje); // Ejemplo con mínimo de 14 VES
+                comision = Math.max(14.0, calculoPorcentaje);
             }
             return comision;
+        }
+
+        function alCambiarMontoVESManual() {
+            const montoVesManual = parseFloat(document.getElementById('input-monto-ves-manual').value) || 0;
+            const montoUSDC = parseFloat(document.getElementById('input-monto').value) || 0;
+
+            if (montoVesManual > 0 && montoUSDC > 0) {
+                const tasaCalc = montoVesManual / montoUSDC;
+                document.getElementById('input-tasa').value = tasaCalc.toFixed(6);
+            }
+            calcularTotalesModal();
+        }
+
+        function alCambiarTasaOUSDC() {
+            let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
+            const montoUSDC = parseFloat(document.getElementById('input-monto').value) || 0;
+            if (tasa > 0 && montoUSDC > 0) {
+                document.getElementById('input-monto-ves-manual').value = (tasa * montoUSDC).toFixed(2);
+            }
+            calcularTotalesModal();
         }
 
         function calcularTotalesModal() {
@@ -797,7 +815,6 @@
             
             let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBs);
             
-            // Suma la comisión bancaria al total en las compras por pago móvil
             let total = montoBs;
             if (tipo === 'COMPRA' && esPagoMovil(metodo)) {
                 total = montoBs + comisionBancaria;
@@ -809,7 +826,6 @@
             document.getElementById('modal-total').innerText = total.toFixed(2);
         }
 
-        
         async function ejecutarPegadoEspecial() {
             try {
                 if (navigator.clipboard && navigator.clipboard.readText) {
@@ -949,7 +965,7 @@
                 }
 
                 let totalBsFinal = 0;
-                if (tipo === 'COMPRA') {
+                if (tipo === 'COMPRA' && esPagoMovil(metodo)) {
                     let comisionBancaria = calcularComisionBancaria(tipo, metodo, vesManual);
                     totalBsFinal = vesManual + comisionBancaria;
                 } else {
@@ -1115,8 +1131,9 @@
                                 fecha: op.fecha 
                             });
 
-                            if (lote.montoRestante <= 0.001) {
+                            if (lote.montoRestante <= 0.0001) {
                                 lote.estado = 'CERRADO';
+                                lote.montoRestante = 0;
                             }
                         }
                     }
@@ -1260,166 +1277,36 @@
                     if(!usuariosMap[op.usuario]) {
                         usuariosMap[op.usuario] = { totalOps: 0, completadas: 0 };
                     }
-        function recalcularLotesMotor() {
-            let lotesActivos = [];
-            let contadorLote = 1;
-            
-            operaciones.forEach(op => {
-                op.gananciaVes = 0;
-                op.gananciaCripto = 0;
-                op.loteTag = '';
-                op.loteObj = null;
-                op.lotesConsumidos = [];
-            });
-
-            const opsCronologico = [...operaciones].reverse();
-
-            opsCronologico.forEach(op => {
-                const tipoUpper = (op.tipo || '').toUpperCase();
-                if (tipoUpper === 'VENTA') {
-                    const nuevoLote = {
-                        idTag: 'L' + contadorLote,
-                        tasaVenta: op.tasa,
-                        montoInicial: op.monto,
-                        montoRestante: op.monto,
-                        estado: 'ABIERTO',
-                        fecha: op.fecha,
-                        consumos: []
-                    };
-                    contadorLote++;
-                    lotesActivos.push(nuevoLote);
-                    op.loteObj = nuevoLote;
-                    op.loteTag = nuevoLote.idTag;
-                } else if (tipoUpper === 'COMPRA') {
-                    let montoPorCubrir = op.monto;
-                    let gananciaVesTotal = 0;
-                    let gananciaUsdcTotal = 0;
-                    let descLotes = [];
-                    let consumosCompra = [];
-
-                    for (let lote of lotesActivos) {
-                        if (lote.estado === 'ABIERTO' && montoPorCubrir > 0) {
-                            let asignado = Math.min(lote.montoRestante, montoPorCubrir);
-                            let difTasa = lote.tasaVenta - op.tasa;
-                            let gVes = difTasa * asignado;
-                            let gUsdc = gVes / lote.tasaVenta;
-
-                            gananciaVesTotal += gVes;
-                            gananciaUsdcTotal += gUsdc;
-
-                            lote.montoRestante -= asignado;
-                            montoPorCubrir -= asignado;
-
-                            descLotes.push(`${lote.idTag}(${asignado.toFixed(2)})`);
-                            consumosCompra.push({ loteTag: lote.idTag, monto: asignado });
-                            lote.consumos.push({ 
-                                usuarioCompra: op.usuario, 
-                                monto: asignado, 
-                                fecha: op.fecha 
-                            });
-
-                            if (lote.montoRestante <= 0.0001) {
-                                lote.estado = 'CERRADO';
-                                lote.montoRestante = 0;
-                            }
-                        }
+                    usuariosMap[op.usuario].totalOps++;
+                    if(op.estatus === 'Completado') {
+                        usuariosMap[op.usuario].completadas++;
                     }
-
-                    op.gananciaVes = gananciaVesTotal;
-                    op.gananciaCripto = gananciaUsdcTotal;
-                    op.lotesConsumidos = consumosCompra;
-                    op.loteTag = descLotes.length > 0 ? descLotes.join(', ') : 'N/A';
                 }
             });
 
-            lotes = lotesActivos;
-            actualizarRatings();
-        }
-
-        function renderizarHistorial(lista) {
-            const container = document.getElementById('history-container');
-            if (!container) return;
-            if (lista.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">No hay operaciones para este día.</div>`;
+            const keys = Object.keys(usuariosMap);
+            if(keys.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px;">Sin calificaciones aún.</div>`;
                 return;
             }
 
             let html = '';
-            lista.forEach((op) => {
-                const opTipoUpper = (op.tipo || '').toUpperCase();
-                const esVenta = opTipoUpper === 'VENTA';
-                const classType = esVenta ? 'type-venta' : 'type-compra';
-                const classAvatar = esVenta ? 'avatar-venta' : 'avatar-compra';
-                const classTag = esVenta ? 'tag-venta' : 'tag-compra';
-                const inicialUser = (op.usuario || 'U').charAt(0).toUpperCase();
-
-                let loteBadgeHtml = '';
-                if (esVenta && op.loteObj) {
-                    if (op.loteObj.estado === 'CERRADO') {
-                        loteBadgeHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span style="color: var(--accent-green); font-size: 0.75rem; font-weight: bold;">● Cerrado</span>`;
-                    } else {
-                        loteBadgeHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span style="color: var(--accent-orange); font-size: 0.75rem; font-weight: bold;">(Falta ${op.loteObj.montoRestante.toFixed(2)})</span>`;
-                    }
-                } else if (!esVenta) {
-                    loteBadgeHtml = `Lote: <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag || 'N/A'}</span>`;
-                } else {
-                    loteBadgeHtml = `Lote: <span style="color: var(--neon-blue); font-weight: bold;">N/A</span>`;
-                }
-
-                let gananciaVes = op.gananciaVes || 0;
-                let gananciaUsdc = op.gananciaCripto || 0;
-
+            keys.forEach(usr => {
+                const data = usuariosMap[usr];
                 html += `
-                    <div class="op-card-item ${classType}" onclick="abrirDetalleOp(${op.id})">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <div class="avatar-circle ${classAvatar}">${inicialUser}</div>
-                                <div>
-                                    <div style="font-size: 0.95rem; font-weight: 800; color: #fff;">${op.usuario} <span style="color: var(--accent-orange); font-size: 0.8rem;">5.0 ★</span></div>
-                                    <div style="font-size: 0.72rem; color: var(--text-muted);">${op.metodo} ➔ Syklo</div>
-                                </div>
-                            </div>
-                            <span class="tag-tipo ${classTag}">${opTipoUpper}</span>
+                    <div class="neon-card" style="padding: 12px; margin-bottom: 8px; cursor: default;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:bold; font-size:0.95rem;">${usr}</span>
+                            <span style="color:var(--accent-green); font-size:0.85rem; font-weight:bold;">5.0 ★</span>
                         </div>
-
-                        <div class="op-grid-2x2">
-                            <div>
-                                <div class="op-grid-col-label">MONTO USDC</div>
-                                <div class="op-grid-col-val">${op.monto.toFixed(3)}</div>
-                            </div>
-                            <div>
-                                <div class="op-grid-col-label">MONTO BS</div>
-                                <div class="op-grid-col-val">${op.montoBs.toFixed(2)}</div>
-                            </div>
-                            <div>
-                                <div class="op-grid-col-label">TASA</div>
-                                <div class="op-grid-col-val">${op.tasa.toFixed(2)}</div>
-                            </div>
-                            <div>
-                                <div class="op-grid-col-label">GANANCIA</div>
-                                <div class="ganancia-val-green">+${gananciaVes.toFixed(2)} <span style="font-size: 0.7rem;">VES</span></div>
-                                <div class="ganancia-sub-usdc">≈ +${gananciaUsdc.toFixed(2)} USDC</div>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed var(--card-border); padding-top: 8px;">
-                            <div style="font-size: 0.72rem; color: var(--text-muted);">
-                                REF: <span style="color: #cbd5e1;">${op.referencia}</span> · ${loteBadgeHtml}
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 6px;" onclick="event.stopPropagation()">
-                                <button type="button" onclick="pedirConfirmacionMover(${op.id}, 'arriba')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem;" title="Subir">⬆️</button>
-                                <button type="button" onclick="pedirConfirmacionMover(${op.id}, 'abajo')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem;" title="Bajar">⬇️</button>
-                                <span class="status-pill">● ${op.estatus}</span>
-                                <button type="button" onclick="editarOp(${op.id})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;" title="Editar">✏️</button>
-                                <button type="button" onclick="eliminarOp(${op.id})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;" title="Eliminar">🗑️</button>
-                            </div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">
+                            Operaciones registradas: <b>${data.totalOps}</b> (${data.completadas} completadas)
                         </div>
                     </div>
                 `;
             });
             container.innerHTML = html;
         }
-
 
         function filtrarHistorial() {
             const qInput = document.getElementById('busqueda-filtro');
@@ -1462,9 +1349,9 @@
                 let loteBadgeHtml = '';
                 if (esVenta && op.loteObj) {
                     if (op.loteObj.estado === 'CERRADO') {
-                        loteBadgeHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span style="color: var(--accent-green); font-size: 0.75rem; font-weight: bold;">(Cerrado)</span>`;
+                        loteBadgeHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span style="color: var(--accent-green); font-size: 0.75rem; font-weight: bold;">● Cerrado</span>`;
                     } else {
-                        loteBadgeHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span style="color: var(--accent-orange); font-size: 0.75rem; font-weight: bold;">(Abierto: Falta ${op.loteObj.montoRestante.toFixed(2)} USDC)</span>`;
+                        loteBadgeHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span style="color: var(--accent-orange); font-size: 0.75rem; font-weight: bold;">(Falta ${op.loteObj.montoRestante.toFixed(2)})</span>`;
                     }
                 } else if (!esVenta) {
                     loteBadgeHtml = `Lote: <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag || 'N/A'}</span>`;
