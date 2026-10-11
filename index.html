@@ -649,7 +649,6 @@
 
         function calcularComisionBancaria(tipoOp, metodoOp, montoBsVal) {
             let comision = 0.0;
-            // Se valida robustamente si es COMPRA y el método es Pago Móvil
             if (tipoOp === 'COMPRA' && esPagoMovil(metodoOp)) {
                 let calculoPorcentaje = montoBsVal * 0.003;
                 comision = Math.max(14.0, calculoPorcentaje);
@@ -728,7 +727,6 @@
             
             let esCompra = true;
 
-            // Detección automática precisa basada en los campos copiados de Syklo
             const matchEnviado = textoLower.match(/monto enviado:\s*([\d\.,]+)\s*([a-z]+/i);
             const matchRecibido = textoLower.match(/monto recibido:\s*([\d\.,]+)\s*([a-z]+/i);
 
@@ -736,19 +734,16 @@
                 let unidadEnviada = matchEnviado[2].toUpperCase();
                 let unidadRecibida = matchRecibido[2].toUpperCase();
                 
-                // Si envías VES (Bolívares) y recibes USDC, es una COMPRA.
-                // Si envías USDC y recibes VES, es una VENTA.
-                if (unidadEnviada.includes('VES') || unidadEnviada.includes('BS')) {
-                    esCompra = true;
-                } else if (unidadEnviada.includes('USDC') || unidadEnviada.includes('USD')) {
+                if (unidadEnviada.includes('USDC') || unidadEnviada.includes('USD')) {
                     esCompra = false;
-                } else if (unidadRecibida.includes('VES') || unidadRecibida.includes('BS')) {
-                    esCompra = false; // Recibes VES porque vendiste cripto
-                } else {
+                } else if (unidadEnviada.includes('VES') || unidadEnviada.includes('BS')) {
                     esCompra = true;
+                } else if (unidadRecibida.includes('USDC') || unidadRecibida.includes('USD')) {
+                    esCompra = true;
+                } else if (unidadRecibida.includes('VES') || unidadRecibida.includes('BS')) {
+                    esCompra = false;
                 }
             } else {
-                // Respaldos por palabras clave directas
                 if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('venta')) {
                     esCompra = false;
                 } else if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('compra')) {
@@ -756,7 +751,6 @@
                 }
             }
 
-            // Asignar automáticamente el tipo de operación detectado
             document.getElementById('input-tipo').value = esCompra ? 'COMPRA' : 'VENTA';
 
             let usuarioEncontrado = "";
@@ -847,7 +841,6 @@
                     vesManual = monto * (tasa > 0 ? tasa : 1);
                 }
 
-                // Cálculo definitivo sumando la comisión bancaria si es Compra y usa Pago Móvil
                 let totalBsFinal = 0;
                 if (tipo === 'COMPRA') {
                     let comisionBancaria = calcularComisionBancaria(tipo, metodo, vesManual);
