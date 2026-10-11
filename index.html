@@ -1040,7 +1040,6 @@
             const totalBsFinal = (tipo === 'COMPRA') ? (montoBsBase + comisionBancaria) : (montoBsBase - comisionBancaria);
 
             if (editId) {
-                // Editar existente
                 const index = operaciones.findIndex(o => o.id == editId);
                 if (index !== -1) {
                     operaciones[index].usuario = usuario;
@@ -1055,7 +1054,6 @@
                     operaciones[index].montoBs = totalBsFinal;
                 }
             } else {
-                // Crear nueva
                 const nuevaOp = {
                     id: Date.now(),
                     usuario, 
@@ -1228,7 +1226,6 @@
             const gMesVes = opsMes.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gMesUsdc = opsMes.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
 
-            document.getElementById('res-ganancia-hoy-ves').innerText = gMesVes.toFixed(2) + " VES"; // ajustado
             document.getElementById('res-ganancia-hoy-ves').innerText = gHoyVes.toFixed(2) + " VES";
             document.getElementById('res-ganancia-hoy-usdc').innerText = gHoyUsdc.toFixed(4) + " USDC";
 
@@ -1310,6 +1307,14 @@
                             GANANCIA: <b>+${gVes.toFixed(2)} VES</b><br>
                             <span style="font-size:0.75rem; color: var(--text-muted);">≈ +${gCripto.toFixed(4)} USDC</span>
                         </div>`;
+                } else {
+                    let gVes = op.gananciaVes || 0;
+                    let gCripto = op.gananciaCripto || 0;
+                    gananciaHtml = `
+                        <div style="font-size:0.8rem; color: var(--accent-green); margin-top: 6px; border-top: 1px dashed var(--card-border); padding-top: 4px;">
+                            GANANCIA: <b>+${gVes.toFixed(2)} VES</b><br>
+                            <span style="font-size:0.75rem; color: var(--text-muted);">≈ +${gCripto.toFixed(4)} USDC</span>
+                        </div>`;
                 }
 
                 html += `
@@ -1364,33 +1369,6 @@
             const opTipoUpper = (op.tipo || '').toUpperCase();
             const colorTipo = opTipoUpper === 'COMPRA' ? 'var(--accent-green)' : 'var(--accent-red)';
 
-            let htmlFifo = '';
-            if (opTipoUpper === 'COMPRA') {
-                htmlFifo = `
-                    <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; color: var(--text-muted);">FIFO / LOTES</div>
-                    <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; font-size: 0.8rem;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                            <span>Asociado a Lote:</span>
-                            <b style="color: var(--neon-blue);">${op.lote || 'N/A'}</b>
-                        </div>
-                        <div style="display:flex; justify-content:space-between;">
-                            <span>Ganancia Calculada:</span>
-                            <b style="color: var(--accent-green);">+${(op.gananciaVes || 0).toFixed(2)} VES</b>
-                        </div>
-                    </div>
-                `;
-            } else {
-                htmlFifo = `
-                    <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; color: var(--text-muted);">ESTADO DEL LOTE</div>
-                    <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; font-size: 0.8rem;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <span>Lote Creado:</span>
-                            <b style="color: var(--neon-blue);">${op.lote || 'N/A'}</b>
-                        </div>
-                    </div>
-                `;
-            }
-
             document.getElementById('contenido-detalle-op').innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3 style="margin: 0; color: #fff; font-size: 1.1rem;">📄 Detalle de Operación</h3>
@@ -1433,8 +1411,6 @@
                         <div style="font-weight: bold; font-size: 0.95rem; color: var(--neon-blue);">${op.lote || 'N/A'}</div>
                     </div>
                 </div>
-
-                ${htmlFifo}
             `;
 
             document.getElementById('modal-detalle-op').style.display = 'flex';
