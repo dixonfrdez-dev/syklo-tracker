@@ -337,7 +337,7 @@
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Ajustes</h3>
         <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px;">
             <div style="font-weight: bold; margin-bottom: 5px;">Comisión y Motor de Lotes</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Asignación automática a la fecha seleccionada en el encabezado.</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Asignación de fecha independiente por operación y control por día.</div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -370,6 +370,11 @@
             </div>
 
             <input type="hidden" id="input-edit-id" value="">
+
+            <div class="form-group" style="margin-top: 8px;">
+                <label>Fecha de la Operación</label>
+                <input type="date" id="input-fecha-op">
+            </div>
 
             <div class="form-group" style="margin-top: 8px;">
                 <label>Usuario</label>
@@ -563,6 +568,7 @@
         function abrirModalNuevaOp() {
             document.getElementById('modal-titulo-op').innerText = "Nueva Operación";
             document.getElementById('input-edit-id').value = "";
+            document.getElementById('input-fecha-op').value = fechaActualStr; // Toma por defecto la fecha que estás viendo arriba
             document.getElementById('input-usuario').value = "";
             document.getElementById('input-ref').value = "";
             document.getElementById('input-monto').value = "";
@@ -807,6 +813,7 @@
         function guardarOperacion() {
             try {
                 const editId = document.getElementById('input-edit-id').value;
+                const fechaOp = document.getElementById('input-fecha-op').value || fechaActualStr;
                 const usuario = document.getElementById('input-usuario').value.trim() || 'N/A';
                 const referencia = document.getElementById('input-ref').value.trim() || 'N/A';
                 const estatus = document.getElementById('input-estatus').value;
@@ -844,6 +851,7 @@
                 if (editId) {
                     const index = operaciones.findIndex(o => o.id == editId);
                     if (index !== -1) {
+                        operaciones[index].fecha = fechaOp;
                         operaciones[index].usuario = usuario;
                         operaciones[index].referencia = referencia;
                         operaciones[index].estatus = estatus;
@@ -853,7 +861,6 @@
                         operaciones[index].tasa = tasa > 0 ? tasa : 1;
                         operaciones[index].comisionCripto = comisionCripto;
                         operaciones[index].montoBs = totalBsFinal;
-                        // Mantiene la fecha original o la actual si no la tenía
                     }
                 } else {
                     const nuevaOp = {
@@ -867,8 +874,7 @@
                         tasa: tasa > 0 ? tasa : 1, 
                         comisionCripto, 
                         montoBs: totalBsFinal,
-                        // Asigna la fecha seleccionada actualmente en el calendario superior
-                        fecha: fechaActualStr
+                        fecha: fechaOp // Se guarda con la fecha específica que seleccionaste en el formulario
                     };
                     operaciones.unshift(nuevaOp);
                 }
@@ -894,6 +900,7 @@
 
             document.getElementById('modal-titulo-op').innerText = "Editar Operación";
             document.getElementById('input-edit-id').value = op.id;
+            document.getElementById('input-fecha-op').value = op.fecha || fechaActualStr;
             document.getElementById('input-usuario').value = op.usuario;
             document.getElementById('input-ref').value = op.referencia;
             document.getElementById('input-estatus').value = op.estatus;
@@ -1143,12 +1150,14 @@
             const tipoFiltro = document.getElementById('filtro-tipo').value.toUpperCase();
             const metodoFiltro = document.getElementById('filtro-metodo').value;
 
+            // Filtramos las operaciones que coinciden con la fecha seleccionada en el header y los demás filtros
             const filtradas = operaciones.filter(op => {
+                const matchFecha = op.fecha === fechaActualStr;
                 const matchQ = op.usuario.toLowerCase().includes(q) || op.referencia.toLowerCase().includes(q);
                 const opTipoUpper = (op.tipo || '').toUpperCase();
                 const matchTipo = (tipoFiltro === 'TODAS' || opTipoUpper === tipoFiltro);
                 const matchMetodo = (metodoFiltro === 'Todos' || op.metodo === metodoFiltro);
-                return matchQ && matchTipo && matchMetodo;
+                return matchFecha && matchQ && matchTipo && matchMetodo;
             });
 
             renderizarHistorial(filtradas);
@@ -1157,7 +1166,7 @@
         function renderizarHistorial(lista) {
             const container = document.getElementById('history-container');
             if (lista.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">No se encontraron operaciones.</div>`;
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">No hay operaciones para este día.</div>`;
                 return;
             }
 
