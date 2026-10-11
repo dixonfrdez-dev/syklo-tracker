@@ -747,11 +747,11 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                 <div class="neon-card" style="text-align: center; border-color: var(--accent-green); cursor: default;">
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">📥 RECOMPRA</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">📥 RECOMPRA (DEUDA)</div>
                     <div id="pend-recompra-monto" style="font-size: 1rem; font-weight: bold; color: var(--accent-green); margin-top: 4px;">0.00 USDC</div>
                 </div>
                 <div class="neon-card" style="text-align: center; border-color: var(--accent-red); cursor: default;">
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">📤 REVENTA</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">📤 REVENTA (STOCK)</div>
                     <div id="pend-reventa-monto" style="font-size: 1rem; font-weight: bold; color: var(--accent-red); margin-top: 4px;">0.00 USDC</div>
                 </div>
             </div>
@@ -981,17 +981,27 @@
                 document.getElementById('input-monto').value = montoUSDC;
             }
 
+            // CORRECCIÓN DE TASA / PRECIO (SOPORTE PUNTO Y COMA)
             let tasaCalculada = 0;
             const matchPrecio = texto.match(/precio:\s*(\d{1,3}(\.\d{3})*(,\d+)?|\d+([.,]\d+)?)/i);
             
             if (matchPrecio) {
-                let rawP = matchPrecio[1];
+                let rawP = matchPrecio[1].trim();
                 if (rawP.includes('.') && rawP.includes(',')) {
+                    // Formato latino con miles en punto y decimal en coma (Ej: 1.002,007)
                     rawP = rawP.replace(/\./g, '').replace(',', '.');
                 } else if (rawP.includes(',')) {
                     rawP = rawP.replace(',', '.');
                 }
                 tasaCalculada = parseFloat(rawP);
+
+                // Corrección de escala si detecta una tasa menor a 100 en VES
+                if (tasaCalculada < 100 && tasaCalculada > 0) {
+                    let tasaNormalizada = parseFloat(rawP.replace('.', ''));
+                    if (tasaNormalizada >= 100) {
+                        tasaCalculada = tasaNormalizada / 1000;
+                    }
+                }
             }
             if (tasaCalculada > 0) {
                 document.getElementById('input-tasa').value = tasaCalculada.toFixed(3);
@@ -1131,8 +1141,10 @@
             const lotesAbiertos = lotes.filter(l => l.estado === 'ABIERTO').length;
 
             const totalRecompraPendiente = lotes.filter(l => l.estado === 'ABIERTO').reduce((acc, l) => acc + l.montoRestante, 0);
-            const reventaPendienteOps = operaciones.filter(op => op.estatus === 'En Curso' && (op.tipo || '').toUpperCase() === 'VENTA');
-            const totalReventaPendiente = reventaPendienteOps.reduce((acc, op) => acc + op.monto, 0);
+            const totalComprasCripto = comprasTotales.reduce((acc, op) => acc + op.monto, 0);
+            const totalVentasCripto = ventasTotales.reduce((acc, op) => acc + op.monto, 0);
+            const totalReventaPendiente = Math.max(0, totalComprasCripto - totalVentasCripto);
+
             const totalPendientesUSDC = totalRecompraPendiente + totalReventaPendiente;
 
             document.getElementById('dash-prom-compra').innerText = promCompra.toFixed(2);
@@ -1187,10 +1199,14 @@
 
         function actualizarContenidoPendientes() {
             const lotesAbiertos = lotes.filter(l => l.estado === 'ABIERTO');
-            const reventaPendienteOps = operaciones.filter(op => op.estatus === 'En Curso' && (op.tipo || '').toUpperCase() === 'VENTA');
-
             const totalRecompra = lotesAbiertos.reduce((acc, l) => acc + l.montoRestante, 0);
-            const totalReventa = reventaPendienteOps.reduce((acc, op) => acc + op.monto, 0);
+
+            const comprasTotales = operaciones.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
+            const ventasTotales = operaciones.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
+            const totalComprasCripto = comprasTotales.reduce((acc, op) => acc + op.monto, 0);
+            const totalVentasCripto = ventasTotales.reduce((acc, op) => acc + op.monto, 0);
+
+            const totalReventa = Math.max(0, totalComprasCripto - totalVentasCripto);
 
             document.getElementById('pend-recompra-monto').innerText = totalRecompra.toFixed(2) + " USDC";
             document.getElementById('pend-reventa-monto').innerText = totalReventa.toFixed(2) + " USDC";
@@ -1199,9 +1215,20 @@
                 lotesAbiertos.map(l => `<div>• Lote ${l.idTag} - Falta recomprar: <b>${l.montoRestante.toFixed(2)} USDC</b></div>`).join('') : 
                 'No hay recompra pendiente.';
 
-            document.getElementById('lista-reventa-pendientes').innerHTML = reventaPendienteOps.length > 0 ? 
-                reventaPendienteOps.map(op => `<div>• ${op.usuario} - Ref: ${op.referencia} (${op.monto} USDC)</div>`).join('') : 
-                'No hay reventa pendiente.';
+            const reventaPendienteOps = operaciones.filter(op => op.estatus === 'En Curso' && (op.tipo || '').toUpperCase() === 'VENTA');
+            
+            let htmlReventa = '';
+            if (totalReventa > 0) {
+                htmlReventa += `<div style="margin-bottom:4px; color: var(--accent-orange);">• Inventario disponible por colocar: <b>${totalReventa.toFixed(2)} USDC</b></div>`;
+            }
+            if (reventaPendienteOps.length > 0) {
+                htmlReventa += reventaPendienteOps.map(op => `<div>• En Curso con ${op.usuario} - Ref: ${op.referencia} (<b>${op.monto.toFixed(2)} USDC</b>)</div>`).join('');
+            }
+            if (!htmlReventa) {
+                htmlReventa = 'No hay reventa pendiente.';
+            }
+
+            document.getElementById('lista-reventa-pendientes').innerHTML = htmlReventa;
         }
 
         function filtrarHistorial() {
