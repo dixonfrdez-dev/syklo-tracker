@@ -306,6 +306,7 @@
             border-radius: 14px;
             padding: 12px;
             margin-bottom: 10px;
+            cursor: pointer;
         }
         .op-header-row {
             display: flex;
@@ -694,6 +695,13 @@
         </div>
     </div>
 
+    <!-- MODAL DETALLE DE OPERACIÓN (FIFO / LOTES) -->
+    <div class="modal" id="modal-detalle-op">
+        <div class="modal-content" id="contenido-detalle-op">
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+
     <!-- MODAL RESUMEN DE GANANCIAS -->
     <div class="modal" id="modal-resumen-ganancias">
         <div class="modal-content">
@@ -705,34 +713,22 @@
                 <button onclick="cerrarModalResumenGanancias()" class="btn-modal-close">✕</button>
             </div>
 
-            <!-- HOY -->
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                    <span>🔆</span> HOY
-                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">🔆 HOY</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-hoy-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-hoy-usdc">0.0000 USDC</div>
-                <div style="position: absolute; right: 5px; bottom: 0px; font-size: 3rem; opacity: 0.08; pointer-events: none;">🍀</div>
             </div>
 
-            <!-- ESTA SEMANA -->
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                    <span>📅</span> ESTA SEMANA
-                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">📅 ESTA SEMANA</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-sem-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-sem-usdc">0.0000 USDC</div>
-                <div style="position: absolute; right: 5px; bottom: 0px; font-size: 3rem; opacity: 0.08; pointer-events: none;">🍀</div>
             </div>
 
-            <!-- ESTE MES -->
             <div class="neon-card" style="margin-bottom: 4px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                    <span>🗓️</span> ESTE MES
-                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">🗓️ ESTE MES</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-mes-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-mes-usdc">0.0000 USDC</div>
-                <div style="position: absolute; right: 5px; bottom: 0px; font-size: 3rem; opacity: 0.08; pointer-events: none;">🍀</div>
             </div>
         </div>
     </div>
@@ -1268,7 +1264,7 @@
                 }
 
                 html += `
-                    <div class="op-card-item">
+                    <div class="op-card-item" onclick="abrirDetalleOp(${op.id})">
                         <div class="op-header-row">
                             <div>
                                 <strong style="font-size: 0.9rem;">${op.usuario}</strong>
@@ -1300,7 +1296,7 @@
 
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">
                             <span>REF: ${op.referencia} · ${op.fecha}</span>
-                            <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="display: flex; gap: 10px; align-items: center;" onclick="event.stopPropagation()">
                                 <span class="badge badge-compra">${op.estatus}</span>
                                 <button onclick="eliminarOp(${op.id})" style="background:none; border:none; color:var(--accent-red); cursor:pointer; font-size:0.9rem;" title="Eliminar">🗑️</button>
                             </div>
@@ -1309,6 +1305,86 @@
                 `;
             });
             container.innerHTML = html;
+        }
+
+        function abrirDetalleOp(id) {
+            const op = operaciones.find(o => o.id === id);
+            if(!op) return;
+
+            const opTipoUpper = (op.tipo || '').toUpperCase();
+            const colorTipo = opTipoUpper === 'COMPRA' ? 'var(--accent-green)' : 'var(--accent-red)';
+
+            let htmlFifo = '';
+            if (opTipoUpper === 'COMPRA') {
+                htmlFifo = `
+                    <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; color: var(--text-muted);">FIFO / LOTES</div>
+                    <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; font-size: 0.8rem;">
+                        <div style="display:flex; justify-content:between; margin-bottom:4px;">
+                            <span>Asociado a Lote:</span>
+                            <b style="color: var(--neon-blue);">${op.lote || 'N/A'}</b>
+                        </div>
+                        <div style="display:flex; justify-content:between;">
+                            <span>Ganancia Calculada:</span>
+                            <b style="color: var(--accent-green);">+${(op.gananciaVes || 0).toFixed(2)} VES</b>
+                        </div>
+                    </div>
+                `;
+            } else {
+                htmlFifo = `
+                    <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; color: var(--text-muted);">ESTADO DEL LOTE</div>
+                    <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; font-size: 0.8rem;">
+                        <div style="display:flex; justify-content:between;">
+                            <span>Lote Creado:</span>
+                            <b style="color: var(--neon-blue);">${op.lote || 'N/A'}</b>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('contenido-detalle-op').innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0; color: #fff; font-size: 1.1rem;">📄 Detalle de Operación</h3>
+                    <button onclick="document.getElementById('modal-detalle-op').style.display='none'" class="btn-modal-close">✕</button>
+                </div>
+
+                <div style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-size: 1rem; font-weight: bold;">${op.usuario}</span>
+                        <span class="badge" style="background:${colorTipo}20; color:${colorTipo}; border:1px solid ${colorTipo};">${opTipoUpper}</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span>Referencia: <b>${op.referencia}</b></span>
+                        <span>Fecha: <b>${op.fecha}</b></span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); display:flex; justify-content:space-between;">
+                        <span>Método: <b>${op.metodo}</b></span>
+                        <span>Estatus: <b>${op.estatus}</b></span>
+                    </div>
+                </div>
+
+                <div class="op-details-grid" style="margin-bottom: 12px;">
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.7rem;">MONTO USDC</div>
+                        <div style="font-weight: bold; font-size: 0.95rem;">${op.monto.toFixed(3)}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.7rem;">MONTO BS</div>
+                        <div style="font-weight: bold; font-size: 0.95rem;">${op.montoBs.toFixed(2)}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.7rem;">TASA</div>
+                        <div style="font-weight: bold; font-size: 0.95rem;">${op.tasa.toFixed(2)}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.7rem;">LOTE</div>
+                        <div style="font-weight: bold; font-size: 0.95rem; color: var(--neon-blue);">${op.lote || 'N/A'}</div>
+                    </div>
+                </div>
+
+                ${htmlFifo}
+            `;
+
+            document.getElementById('modal-detalle-op').style.display = 'flex';
         }
 
         function eliminarOp(id) {
