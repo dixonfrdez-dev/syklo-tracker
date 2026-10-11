@@ -1073,7 +1073,7 @@
             mostrarToast("✓ Orden actualizado. Recalculando...");
         }
 
-        function recalcularLotesMotor() {
+                function recalcularLotesMotor() {
             let lotesActivos = [];
             let contadorLote = 1;
             
@@ -1097,6 +1097,7 @@
                         montoRestante: op.monto,
                         estado: 'ABIERTO',
                         fecha: op.fecha,
+                        operacionVentaRef: op, // Referencia directa a la venta
                         consumos: []
                     };
                     contadorLote++;
@@ -1105,8 +1106,6 @@
                     op.loteTag = nuevoLote.idTag;
                 } else if (tipoUpper === 'COMPRA') {
                     let montoPorCubrir = op.monto;
-                    let gananciaVesTotal = 0;
-                    let gananciaUsdcTotal = 0;
                     let descLotes = [];
                     let consumosCompra = [];
 
@@ -1117,8 +1116,11 @@
                             let gVes = difTasa * asignado;
                             let gUsdc = gVes / lote.tasaVenta;
 
-                            gananciaVesTotal += gVes;
-                            gananciaUsdcTotal += gUsdc;
+                            // Asignar las ganancias a la VENTA que abrió este lote
+                            if (lote.operacionVentaRef) {
+                                lote.operacionVentaRef.gananciaVes = (lote.operacionVentaRef.gananciaVes || 0) + gVes;
+                                lote.operacionVentaRef.gananciaCripto = (lote.operacionVentaRef.gananciaCripto || 0) + gUsdc;
+                            }
 
                             lote.montoRestante -= asignado;
                             montoPorCubrir -= asignado;
@@ -1138,8 +1140,6 @@
                         }
                     }
 
-                    op.gananciaVes = gananciaVesTotal;
-                    op.gananciaCripto = gananciaUsdcTotal;
                     op.lotesConsumidos = consumosCompra;
                     op.loteTag = descLotes.length > 0 ? descLotes.join(', ') : 'N/A';
                 }
@@ -1148,6 +1148,7 @@
             lotes = lotesActivos;
             actualizarRatings();
         }
+
 
         function actualizarDashboard() {
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
