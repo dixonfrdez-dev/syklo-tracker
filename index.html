@@ -951,7 +951,6 @@
                         montoInicial: op.monto,
                         montoRestante: op.monto,
                         estado: 'ABIERTO',
-                        opVenta: op,
                         consumos: []
                     };
                     contadorLote++;
@@ -980,7 +979,11 @@
 
                             descLotes.push(`${lote.idTag}(${asignado.toFixed(2)})`);
                             consumosCompra.push({ loteTag: lote.idTag, monto: asignado });
-                            lote.consumos.push({ opCompra: op, monto: asignado, fecha: op.fecha });
+                            lote.consumos.push({ 
+                                usuarioCompra: op.usuario, 
+                                monto: asignado, 
+                                fecha: op.fecha 
+                            });
 
                             if (lote.montoRestante <= 0.001) {
                                 lote.estado = 'CERRADO';
@@ -1237,7 +1240,7 @@
                     lote.consumos.forEach(c => {
                         comprasConsumidorasHtml += `
                             <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:4px; padding-left:10px; border-left:2px solid var(--accent-green);">
-                                <span style="color: var(--text-color);"><b>${c.opCompra.usuario}</b> — ${c.monto.toFixed(3)} USDC</span>
+                                <span style="color: var(--text-color);"><b>${c.usuarioCompra}</b> — ${c.monto.toFixed(3)} USDC</span>
                                 <span style="color: var(--text-muted);">${c.fecha}</span>
                             </div>
                         `;
@@ -1353,7 +1356,7 @@
         }
 
         function exportarDatosJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ operaciones, lotes, capitalInicial }));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ operaciones, capitalInicial }));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
             downloadAnchor.setAttribute("download", `syklo_backup_${fechaActualStr}.json`);
@@ -1370,7 +1373,6 @@
                     try {
                         const parsed = JSON.parse(e.target.result);
                         operaciones = parsed.operaciones || [];
-                        lotes = parsed.lotes || [];
                         capitalInicial = parsed.capitalInicial || 0;
                         if(capitalInicial > 0) document.getElementById('txt-capital').innerText = capitalInicial + " VES registrado";
                         recalcularLotesMotor();
@@ -1395,7 +1397,21 @@
         }
 
         function guardarDatos() {
-            localStorage.setItem('syklo_tracker_data', JSON.stringify({ operaciones, lotes, capitalInicial }));
+            // Guardamos solo los datos limpios de operaciones y capital para evitar estructuras circulares
+            const datosLimpios = operaciones.map(op => ({
+                id: op.id,
+                usuario: op.usuario,
+                referencia: op.referencia,
+                estatus: op.estatus,
+                tipo: op.tipo,
+                metodo: op.metodo,
+                monto: op.monto,
+                tasa: op.tasa,
+                comisionCripto: op.comisionCripto,
+                montoBs: op.montoBs,
+                fecha: op.fecha
+            }));
+            localStorage.setItem('syklo_tracker_data', JSON.stringify({ operaciones: datosLimpios, capitalInicial }));
         }
 
         function cargarDatos() {
@@ -1403,7 +1419,6 @@
             if (data) {
                 const parsed = JSON.parse(data);
                 operaciones = parsed.operaciones || [];
-                lotes = parsed.lotes || [];
                 capitalInicial = parsed.capitalInicial || 0;
                 if(capitalInicial > 0) document.getElementById('txt-capital').innerText = capitalInicial + " VES registrado";
                 recalcularLotesMotor();
