@@ -855,6 +855,15 @@
             return m.includes("pagomovil") || m.includes("pago movil");
         }
 
+        function calcularComisionBancaria(tipoOp, metodoOp, montoBsVal) {
+            let comision = 0.0;
+            if (tipoOp === 'COMPRA' && esPagoMovil(metodoOp)) {
+                let calculoPorcentaje = montoBsVal * 0.003;
+                comision = Math.max(14.0, calculoPorcentaje);
+            }
+            return comision;
+        }
+
         function calcularTotalesModal() {
             const monto = parseFloat(document.getElementById('input-monto').value) || 0;
             const tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
@@ -865,12 +874,7 @@
             const montoEfectivoCripto = monto - comisionCripto;
             const montoBs = montoEfectivoCripto * tasa;
             
-            let comisionBancaria = 0.0;
-            if (tipo === 'COMPRA' && esPagoMovil(metodo)) {
-                let comisionCalculada = montoBs * 0.003;
-                comisionBancaria = Math.max(14.0, comisionCalculada);
-            }
-
+            let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBs);
             const total = (tipo === 'COMPRA') ? (montoBs + comisionBancaria) : (montoBs - comisionBancaria);
 
             document.getElementById('modal-monto-bs').innerText = montoBs.toFixed(2);
@@ -1014,12 +1018,7 @@
             const montoEfectivoCripto = monto - comisionCripto;
             const montoBsBase = montoEfectivoCripto * tasa;
             
-            let comisionBancaria = 0.0;
-            if (tipo === 'COMPRA' && esPagoMovil(metodo)) {
-                let comisionCalculada = montoBsBase * 0.003;
-                comisionBancaria = Math.max(14.0, comisionCalculada);
-            }
-            
+            let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBsBase);
             const totalBsFinal = (tipo === 'COMPRA') ? (montoBsBase + comisionBancaria) : (montoBsBase - comisionBancaria);
 
             const nuevaOp = {
