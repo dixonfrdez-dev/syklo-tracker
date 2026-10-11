@@ -337,7 +337,7 @@
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Ajustes</h3>
         <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px;">
             <div style="font-weight: bold; margin-bottom: 5px;">Comisión y Motor de Lotes</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Pagomóvil (0.30%, mín 14 VES solo en compras), cálculo de ganancias por lote y control de pendientes.</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Pagomóvil (0.30%, mín 14 VES en compras), acumulación y cierre de lotes globales.</div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -643,7 +643,6 @@
 
         function calcularComisionBancaria(tipoOp, metodoOp, montoBsVal) {
             let comision = 0.0;
-            // Comisión de Pago Móvil SOLO aplica si es una COMPRA
             if (tipoOp === 'COMPRA' && esPagoMovil(metodoOp)) {
                 let calculoPorcentaje = montoBsVal * 0.003;
                 comision = Math.max(14.0, calculoPorcentaje);
@@ -689,8 +688,6 @@
             }
             
             let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBs);
-            
-            // Si es COMPRA se suma la comisión, si es VENTA queda intacto el monto exacto
             let total = (tipo === 'COMPRA') ? (montoBs + comisionBancaria) : (vesManual > 0 ? vesManual : montoBs);
 
             document.getElementById('modal-monto-bs').innerText = montoBs.toFixed(2);
@@ -841,7 +838,6 @@
                     let comisionBancaria = calcularComisionBancaria(tipo, metodo, vesManual);
                     totalBsFinal = vesManual + comisionBancaria;
                 } else {
-                    // Ventas: se almacena el monto exacto en VES sin comisiones bancarias
                     totalBsFinal = vesManual;
                 }
 
@@ -956,6 +952,7 @@
                 op.lotesConsumidos = [];
             });
 
+            // Procesamos de forma estrictamente cronológica global (de más antiguo a más nuevo)
             const opsCronologico = [...operaciones].reverse();
 
             opsCronologico.forEach(op => {
@@ -1018,6 +1015,7 @@
         }
 
         function actualizarDashboard() {
+            // El dashboard suma la ganancia de las compras que ocurrieron EN LA FECHA ACTUAL, cerrando lotes globales
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
             const comprasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
 
