@@ -1072,8 +1072,8 @@
             actualizarDashboard();
             mostrarToast("✓ Orden actualizado. Recalculando...");
         }
-
-                        function recalcularLotesMotor() {
+        
+        function recalcularLotesMotor() {
             let lotesActivos = [];
             let contadorLote = 1;
             
@@ -1085,8 +1085,8 @@
                 op.lotesConsumidos = [];
             });
 
-            // Recorrer en orden cronológico real (de más antiguo a más nuevo)
-            const opsCronologico = [...operaciones].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+            // Mantiene el orden cronológico original (de más antiguo a más nuevo) sin alterar el orden del mismo día
+            const opsCronologico = [...operaciones].reverse();
 
             opsCronologico.forEach(op => {
                 const tipoUpper = (op.tipo || '').toUpperCase();
@@ -1148,7 +1148,6 @@
             lotes = lotesActivos;
             actualizarRatings();
         }
-
 
 
         function actualizarDashboard() {
