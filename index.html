@@ -1150,13 +1150,14 @@
         }
 
 
-        function actualizarDashboard() {
+                function actualizarDashboard() {
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
             const comprasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
             const ventasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
 
-            const gananciaDiaCripto = comprasDia.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
-            const gananciaDiaVes = comprasDia.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
+            // Las ganancias ahora se acumulan desde las VENTAS del día
+            const gananciaDiaCripto = ventasDia.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
+            const gananciaDiaVes = ventasDia.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
 
             document.getElementById('dash-ganancia-dia-usdc').innerHTML = gananciaDiaCripto.toFixed(4) + ' <span style="font-size: 1.1rem;">USDC</span>';
             document.getElementById('dash-ganancia-dia-ves').innerText = gananciaDiaVes.toFixed(2) + " VES";
@@ -1196,6 +1197,7 @@
 
             filtrarHistorial();
         }
+
 
         function actualizarCalculosResumenGanancias() {
             const opsHoy = operaciones.filter(op => op.fecha === fechaActualStr && (op.tipo || '').toUpperCase() === 'COMPRA');
