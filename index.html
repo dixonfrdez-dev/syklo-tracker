@@ -799,32 +799,34 @@
 
         function guardarOperacion() {
             const editId = document.getElementById('input-edit-id').value;
-            const usuario = document.getElementById('input-usuario').value || 'N/A';
-            const referencia = document.getElementById('input-ref').value || 'N/A';
+            const usuario = document.getElementById('input-usuario').value.trim() || 'N/A';
+            const referencia = document.getElementById('input-ref').value.trim() || 'N/A';
             const estatus = document.getElementById('input-estatus').value;
             const tipo = document.getElementById('input-tipo').value.toUpperCase();
             const metodo = document.getElementById('input-metodo').value;
             const monto = parseFloat(document.getElementById('input-monto').value) || 0;
-            let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
             const comisionCripto = parseFloat(document.getElementById('input-comision-cripto').value) || 0;
             const vesManual = parseFloat(document.getElementById('input-monto-ves-manual').value) || 0;
+            let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
 
             if (monto <= 0) {
-                alert("Ingresa un Monto Cripto válido.");
+                alert("Por favor, ingresa un Monto Cripto válido.");
                 return;
             }
 
             let totalBsFinal = 0;
             if (vesManual > 0) {
                 totalBsFinal = vesManual;
-                if (tasa === 0 && monto > 0) tasa = vesManual / monto;
+                if (tasa <= 0 && monto > 0) {
+                    tasa = vesManual / monto;
+                }
             } else if (tasa > 0 && monto > 0) {
                 const montoEfectivoCripto = monto - comisionCripto;
                 const montoBsBase = montoEfectivoCripto * tasa;
                 let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBsBase);
                 totalBsFinal = (tipo === 'COMPRA') ? (montoBsBase + comisionBancaria) : (montoBsBase - comisionBancaria);
             } else {
-                alert("Ingresa la Tasa o el Monto Exacto VES.");
+                alert("Por favor, ingresa la Tasa de Cambio o el Monto Exacto VES.");
                 return;
             }
 
