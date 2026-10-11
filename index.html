@@ -816,18 +816,14 @@
                     return;
                 }
 
-                if (tasa <= 0 && vesManual > 0) {
+                // Cálculo exacto de la Tasa Bruta
+                if (vesManual > 0 && monto > 0) {
                     tasa = vesManual / monto;
-                }
-                if (vesManual <= 0 && tasa > 0) {
-                    vesManual = (monto - comisionCripto) * tasa;
-                }
-                if (vesManual <= 0) {
-                    vesManual = monto * (tasa > 0 ? tasa : 1);
+                } else if (tasa > 0 && vesManual <= 0) {
+                    vesManual = monto * tasa;
                 }
 
-                let comisionBancaria = calcularComisionBancaria(tipo, metodo, vesManual);
-                let totalBsFinal = (tipo === 'COMPRA') ? (vesManual + comisionBancaria) : (vesManual - comisionBancaria);
+                let totalBsFinal = vesManual > 0 ? vesManual : (monto * tasa);
 
                 if (editId) {
                     const index = operaciones.findIndex(o => o.id == editId);
@@ -1397,7 +1393,6 @@
         }
 
         function guardarDatos() {
-            // Guardamos solo los datos limpios de operaciones y capital para evitar estructuras circulares
             const datosLimpios = operaciones.map(op => ({
                 id: op.id,
                 usuario: op.usuario,
