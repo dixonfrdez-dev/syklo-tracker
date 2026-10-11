@@ -421,12 +421,17 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                 <div class="form-group">
                     <label>Tasa de Cambio</label>
-                    <input type="number" id="input-tasa" step="0.0001" placeholder="0.0000" oninput="calcularTotalesModal()">
+                    <input type="number" id="input-tasa" step="0.000001" placeholder="Ej: 1100" oninput="alCambiarTasaOUSDC()">
                 </div>
                 <div class="form-group">
-                    <label>Monto Cripto</label>
-                    <input type="number" id="input-monto" step="0.01" placeholder="0.00" oninput="calcularTotalesModal()">
+                    <label>Monto Cripto (USDC)</label>
+                    <input type="number" id="input-monto" step="0.001" placeholder="Ej: 25.08" oninput="alCambiarTasaOUSDC()">
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label style="color: var(--accent-orange);">Monto Exacto VES (Opcional)</label>
+                <input type="number" id="input-monto-ves-manual" step="0.01" placeholder="Ej: 27582.75" oninput="alCambiarMontoVESManual()">
             </div>
 
             <div class="form-group">
@@ -449,7 +454,7 @@
                 </div>
                 <hr style="border-color: var(--card-border); margin: 6px 0;">
                 <div style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--neon-blue); font-weight: bold;">⊙ Total a Debitar:</span>
+                    <span style="color: var(--neon-blue); font-weight: bold;">⊙ Total Final VES:</span>
                     <span id="modal-total" style="font-weight: bold; color: var(--neon-blue);">0.00</span>
                 </div>
             </div>
@@ -562,6 +567,7 @@
             document.getElementById('input-ref').value = "";
             document.getElementById('input-monto').value = "";
             document.getElementById('input-tasa').value = "";
+            document.getElementById('input-monto-ves-manual').value = "";
             document.getElementById('input-comision-cripto').value = "0.00";
             toggleModal(true);
         }
@@ -644,15 +650,49 @@
             return comision;
         }
 
+        function alCambiarMontoVESManual() {
+            const montoVesManual = parseFloat(document.getElementById('input-monto-ves-manual').value) || 0;
+            const montoUSDC = parseFloat(document.getElementById('input-monto').value) || 0;
+
+            if (montoVesManual > 0 && montoUSDC > 0) {
+                const tasaCalc = montoVesManual / montoUSDC;
+                document.getElementById('input-tasa').value = tasaCalc.toFixed(6);
+            }
+            calcularTotalesModal();
+        }
+
+        function alCambiarTasaOUSDC() {
+            let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
+            
+            // Auto-corrección si colocan punto en miles (ej. 1.100 en vez de 1100)
+            if (tasa > 0 && tasa < 100) {
+                tasa = tasa * 1000;
+                document.getElementById('input-tasa').value = tasa.toFixed(2);
+            }
+
+            const montoUSDC = parseFloat(document.getElementById('input-monto').value) || 0;
+            if (tasa > 0 && montoUSDC > 0) {
+                document.getElementById('input-monto-ves-manual').value = (tasa * montoUSDC).toFixed(2);
+            }
+            calcularTotalesModal();
+        }
+
         function calcularTotalesModal() {
             const monto = parseFloat(document.getElementById('input-monto').value) || 0;
-            const tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
+            let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
             const comisionCripto = parseFloat(document.getElementById('input-comision-cripto').value) || 0;
             const tipo = document.getElementById('input-tipo').value.toUpperCase();
             const metodo = document.getElementById('input-metodo').value;
             
             const montoEfectivoCripto = monto - comisionCripto;
-            const montoBs = montoEfectivoCripto * tasa;
+            
+            let montoBs = 0;
+            const vesManual = parseFloat(document.getElementById('input-monto-ves-manual').value) || 0;
+            if (vesManual > 0) {
+                montoBs = vesManual;
+            } else {
+                montoBs = montoEfectivoCripto * tasa;
+            }
             
             let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBs);
             const total = (tipo === 'COMPRA') ? (montoBs + comisionBancaria) : (montoBs - comisionBancaria);
@@ -718,29 +758,13 @@
             const matchContraparte = texto.match(/Contraparte:\s*([^\n\r]+)/i);
             if (matchContraparte) {
                 usuarioEncontrado = matchContraparte[1].replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
-            } else {
-                for (let linea of lineas) {
-                    const lLower = linea.toLowerCase();
-                    if (!lLower.includes('transacción') && 
-                        !lLower.includes('completada') && 
-                        !lLower.includes('monto') && 
-                        !lLower.includes('precio') && 
-                        !lLower.includes('comisión') && 
-                        !lLower.includes('ves') && 
-                        !lLower.includes('usdc') && 
-                        !linea.includes('/') && 
-                        linea.length >= 3) {
-                        usuarioEncontrado = linea.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
-                        break;
-                    }
-                }
             }
             if (usuarioEncontrado) {
                 document.getElementById('input-usuario').value = usuarioEncontrado;
             }
 
             const matchRef = texto.match(/([a-f0-9]{8}|[A-Z0-9]{6,12})/i);
-            if (matchRef && !['COMPRA', 'VENTA', 'SYKLO', 'USDC', 'PRECIO', 'MONTO', 'CONTRAPARTE', 'COMISION', 'DETALLE'].includes(matchRef[1].toUpperCase())) {
+            if (matchRef) {
                 document.getElementById('input-ref').value = matchRef[1];
             }
 
@@ -761,7 +785,6 @@
                 document.getElementById('input-monto').value = montoUSDC;
             }
 
-            // Extracción exacta de Monto Recibido en VES si existe para calcular la tasa exacta
             let montoBsExtraido = 0;
             const matchRecibidoVES = texto.match(/monto recibido:\s*([\d\.,]+)\s*VES/i);
             const matchEnviadoVES = texto.match(/monto enviado:\s*([\d\.,]+)\s*VES/i);
@@ -771,89 +794,93 @@
                 montoBsExtraido = parseFloat(matchEnviadoVES[1].replace(/\./g, '').replace(',', '.'));
             }
 
-            let tasaCalculada = 0;
-            if (montoBsExtraido > 0 && montoUSDC > 0) {
-                tasaCalculada = montoBsExtraido / montoUSDC;
-            } else {
-                const matchPrecio = texto.match(/precio:\s*(\d{1,3}(\.\d{3})*(,\d+)?|\d+([.,]\d+)?)/i);
-                if (matchPrecio) {
-                    let rawP = matchPrecio[1].trim();
-                    if (rawP.includes('.') && rawP.includes(',')) {
-                        rawP = rawP.replace(/\./g, '').replace(',', '.');
-                    } else if (rawP.includes(',')) {
-                        rawP = rawP.replace(',', '.');
-                    }
-                    tasaCalculada = parseFloat(rawP);
+            if (montoBsExtraido > 0) {
+                document.getElementById('input-monto-ves-manual').value = montoBsExtraido.toFixed(2);
+                if (montoUSDC > 0) {
+                    let tasaExacta = montoBsExtraido / montoUSDC;
+                    document.getElementById('input-tasa').value = tasaExacta.toFixed(6);
                 }
-            }
-
-            if (tasaCalculada > 0) {
-                document.getElementById('input-tasa').value = tasaCalculada.toFixed(4);
             }
 
             calcularTotalesModal();
         }
 
         function guardarOperacion() {
-            const editId = document.getElementById('input-edit-id').value;
-            const usuario = document.getElementById('input-usuario').value || 'N/A';
-            const referencia = document.getElementById('input-ref').value || 'N/A';
-            const estatus = document.getElementById('input-estatus').value;
-            const tipo = document.getElementById('input-tipo').value.toUpperCase();
-            const metodo = document.getElementById('input-metodo').value;
-            const monto = parseFloat(document.getElementById('input-monto').value);
-            const tasa = parseFloat(document.getElementById('input-tasa').value);
-            const comisionCripto = parseFloat(document.getElementById('input-comision-cripto').value) || 0;
+            try {
+                const editId = document.getElementById('input-edit-id').value;
+                const usuario = document.getElementById('input-usuario').value || 'N/A';
+                const referencia = document.getElementById('input-ref').value || 'N/A';
+                const estatus = document.getElementById('input-estatus').value;
+                const tipo = document.getElementById('input-tipo').value.toUpperCase();
+                const metodo = document.getElementById('input-metodo').value;
+                const monto = parseFloat(document.getElementById('input-monto').value) || 0;
+                let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
+                const comisionCripto = parseFloat(document.getElementById('input-comision-cripto').value) || 0;
+                const vesManual = parseFloat(document.getElementById('input-monto-ves-manual').value) || 0;
 
-            if (isNaN(monto) || isNaN(tasa)) {
-                alert("Ingresa Monto y Tasa válidos.");
-                return;
-            }
-
-            const montoEfectivoCripto = monto - comisionCripto;
-            const montoBsBase = montoEfectivoCripto * tasa;
-            
-            let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBsBase);
-            const totalBsFinal = (tipo === 'COMPRA') ? (montoBsBase + comisionBancaria) : (montoBsBase - comisionBancaria);
-
-            if (editId) {
-                const index = operaciones.findIndex(o => o.id == editId);
-                if (index !== -1) {
-                    operaciones[index].usuario = usuario;
-                    operaciones[index].referencia = referencia;
-                    operaciones[index].estatus = estatus;
-                    operaciones[index].tipo = tipo;
-                    operaciones[index].metodo = metodo;
-                    operaciones[index].monto = monto;
-                    operaciones[index].tasa = tasa;
-                    operaciones[index].comision = comisionBancaria;
-                    operaciones[index].comisionCripto = comisionCripto;
-                    operaciones[index].montoBs = totalBsFinal;
+                if (monto <= 0) {
+                    alert("Ingresa un Monto Cripto válido.");
+                    return;
                 }
-            } else {
-                const nuevaOp = {
-                    id: Date.now(),
-                    usuario, 
-                    referencia, 
-                    estatus, 
-                    tipo, 
-                    metodo, 
-                    monto, 
-                    tasa, 
-                    comision: comisionBancaria, 
-                    comisionCripto, 
-                    montoBs: totalBsFinal,
-                    fecha: fechaActualStr
-                };
-                operaciones.unshift(nuevaOp);
-            }
 
-            recalcularLotesMotor();
-            guardarDatos();
-            actualizarDashboard();
-            toggleModal(false);
-            document.getElementById('modal-detalle-op').style.display = 'none';
-            mostrarToast("✓ Operación guardada con éxito.");
+                if (tasa > 0 && tasa < 100) {
+                    tasa = tasa * 1000;
+                }
+
+                let totalBsFinal = 0;
+                if (vesManual > 0) {
+                    totalBsFinal = vesManual;
+                    if (tasa === 0 && monto > 0) tasa = vesManual / monto;
+                } else if (tasa > 0 && monto > 0) {
+                    const montoEfectivoCripto = monto - comisionCripto;
+                    const montoBsBase = montoEfectivoCripto * tasa;
+                    let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBsBase);
+                    totalBsFinal = (tipo === 'COMPRA') ? (montoBsBase + comisionBancaria) : (montoBsBase - comisionBancaria);
+                } else {
+                    alert("Ingresa la Tasa o el Monto Exacto VES.");
+                    return;
+                }
+
+                if (editId) {
+                    const index = operaciones.findIndex(o => o.id == editId);
+                    if (index !== -1) {
+                        operaciones[index].usuario = usuario;
+                        operaciones[index].referencia = referencia;
+                        operaciones[index].estatus = estatus;
+                        operaciones[index].tipo = tipo;
+                        operaciones[index].metodo = metodo;
+                        operaciones[index].monto = monto;
+                        operaciones[index].tasa = tasa;
+                        operaciones[index].comisionCripto = comisionCripto;
+                        operaciones[index].montoBs = totalBsFinal;
+                    }
+                } else {
+                    const nuevaOp = {
+                        id: Date.now(),
+                        usuario, 
+                        referencia, 
+                        estatus, 
+                        tipo, 
+                        metodo, 
+                        monto, 
+                        tasa, 
+                        comisionCripto, 
+                        montoBs: totalBsFinal,
+                        fecha: fechaActualStr
+                    };
+                    operaciones.unshift(nuevaOp);
+                }
+
+                recalcularLotesMotor();
+                guardarDatos();
+                actualizarDashboard();
+                toggleModal(false);
+                document.getElementById('modal-detalle-op').style.display = 'none';
+                mostrarToast("✓ Operación guardada con éxito.");
+            } catch (err) {
+                console.error("Error al guardar operación:", err);
+                alert("Ocurrió un problema al guardar. Revisa los datos ingresados.");
+            }
         }
 
         function editarOp(id) {
@@ -869,6 +896,7 @@
             document.getElementById('input-metodo').value = op.metodo || 'Pagomóvil';
             document.getElementById('input-monto').value = op.monto;
             document.getElementById('input-tasa').value = op.tasa;
+            document.getElementById('input-monto-ves-manual').value = op.montoBs.toFixed(2);
             document.getElementById('input-comision-cripto').value = op.comisionCripto || 0;
 
             document.getElementById('modal-detalle-op').style.display = 'none';
