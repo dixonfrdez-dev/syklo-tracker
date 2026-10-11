@@ -189,7 +189,7 @@
             </div>
             <div>
                 <input type="date" id="input-fecha-calendario" onchange="seleccionarFechaCalendario(this)">
-                <button class="date-btn" onclick="abrirCalendario()">📅 <span id="header-date">11/10/2026</span></button>
+                <button type="button" class="date-btn" onclick="abrirCalendario()">📅 <span id="header-date">11/10/2026</span></button>
             </div>
         </div>
 
@@ -243,7 +243,7 @@
                         <div style="font-size: 0.72rem; color: var(--text-muted);">Saldo registrado del día</div>
                     </div>
                 </div>
-                <button onclick="editarCapital()" style="background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: #e2e8f0; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600;">✏️ Editar</button>
+                <button type="button" onclick="editarCapital()" style="background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: #e2e8f0; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600;">✏️ Editar</button>
             </div>
             <div style="font-size: 0.82rem; color: var(--text-muted); margin-left: 54px;" id="txt-capital">No hay capital registrado para hoy.</div>
         </div>
@@ -281,8 +281,8 @@
             </div>
         </div>
 
-        <button class="btn-analisis">📊 Análisis Semanal VES</button>
-        <button class="btn-analisis">📊 Análisis Mensual VES</button>
+        <button type="button" class="btn-analisis">📊 Análisis Semanal VES</button>
+        <button type="button" class="btn-analisis">📊 Análisis Mensual VES</button>
     </div>
 
     <!-- VISTA 2: RESUMEN VES -->
@@ -341,24 +341,24 @@
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-            <button onclick="exportarDatosJSON()" style="background: #1e293b; border: 1px solid var(--card-border); color: var(--neon-blue); width: 50%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">📥 Exportar Backup</button>
-            <button onclick="document.getElementById('input-importar').click()" style="background: #1e293b; border: 1px solid var(--card-border); color: var(--accent-green); width: 50%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">📤 Importar Backup</button>
+            <button type="button" onclick="exportarDatosJSON()" style="background: #1e293b; border: 1px solid var(--card-border); color: var(--neon-blue); width: 50%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">📥 Exportar Backup</button>
+            <button type="button" onclick="document.getElementById('input-importar').click()" style="background: #1e293b; border: 1px solid var(--card-border); color: var(--accent-green); width: 50%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">📤 Importar Backup</button>
             <input type="file" id="input-importar" style="display:none" accept=".json" onchange="importarDatosJSON(event)">
         </div>
 
-        <button onclick="borrarTodo()" style="background: var(--accent-red); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">🗑️ Restablecer Todos los Datos</button>
+        <button type="button" onclick="borrarTodo()" style="background: var(--accent-red); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">🗑️ Restablecer Todos los Datos</button>
     </div>
 
     <!-- BOTÓN (+) FLOTANTE -->
-    <button class="fab" onclick="abrirModalNuevaOp()">+</button>
+    <button type="button" class="fab" onclick="abrirModalNuevaOp()">+</button>
 
     <!-- BARRA INFERIOR -->
     <div class="bottom-nav">
-        <button class="nav-item active" onclick="cambiarVista('dashboard', this)"><span>📊</span>Dashboard</button>
-        <button class="nav-item" onclick="cambiarVista('resumen', this)"><span>📋</span>Resumen VES</button>
-        <button class="nav-item" onclick="cambiarVista('usd', this)"><span>💵</span>Operaciones USD</button>
-        <button class="nav-item" onclick="cambiarVista('ratings', this)"><span>⭐</span>Ratings</button>
-        <button class="nav-item" onclick="cambiarVista('ajustes', this)"><span>⚙️</span>Ajustes</button>
+        <button type="button" class="nav-item active" onclick="cambiarVista('dashboard', this)"><span>📊</span>Dashboard</button>
+        <button type="button" class="nav-item" onclick="cambiarVista('resumen', this)"><span>📋</span>Resumen VES</button>
+        <button type="button" class="nav-item" onclick="cambiarVista('usd', this)"><span>💵</span>Operaciones USD</button>
+        <button type="button" class="nav-item" onclick="cambiarVista('ratings', this)"><span>⭐</span>Ratings</button>
+        <button type="button" class="nav-item" onclick="cambiarVista('ajustes', this)"><span>⚙️</span>Ajustes</button>
     </div>
 
     <!-- MODAL NUEVA / EDITAR OPERACIÓN -->
@@ -366,7 +366,7 @@
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h3 id="modal-titulo-op" style="margin: 0; color: #fff; font-size: 1.1rem;">Nueva Operación</h3>
-                <button onclick="toggleModal(false)" class="btn-modal-close">✕</button>
+                <button type="button" onclick="toggleModal(false)" class="btn-modal-close">✕</button>
             </div>
 
             <input type="hidden" id="input-edit-id" value="">
@@ -472,8 +472,8 @@
             <input type="hidden" id="mover-id-op" value="">
             <input type="hidden" id="mover-dir-op" value="">
             <div style="display: flex; gap: 10px;">
-                <button onclick="cerrarModalMover()" style="background: #1e2638; border: 1px solid var(--card-border); color: #fff; width: 50%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Cancelar</button>
-                <button onclick="ejecutarMovimientoOp()" style="background: var(--accent-orange); border: none; color: #000; width: 50%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Sí, Mover</button>
+                <button type="button" onclick="cerrarModalMover()" style="background: #1e2638; border: 1px solid var(--card-border); color: #fff; width: 50%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Cancelar</button>
+                <button type="button" onclick="ejecutarMovimientoOp()" style="background: var(--accent-orange); border: none; color: #000; width: 50%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Sí, Mover</button>
             </div>
         </div>
     </div>
@@ -491,7 +491,7 @@
                     <span style="color: var(--accent-green); font-size: 1.1rem;">📈</span>
                     <h3 style="margin: 0; color: #fff; font-size: 1.1rem; font-weight: 700;">Resumen de Ganancias</h3>
                 </div>
-                <button onclick="cerrarModalResumenGanancias()" class="btn-modal-close">✕</button>
+                <button type="button" onclick="cerrarModalResumenGanancias()" class="btn-modal-close">✕</button>
             </div>
 
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
@@ -519,7 +519,7 @@
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0; color: var(--neon-blue); font-size: 1.1rem;">⏱️ Detalles de Pendientes</h3>
-                <button onclick="cerrarModalPendientes()" class="btn-modal-close">✕</button>
+                <button type="button" onclick="cerrarModalPendientes()" class="btn-modal-close">✕</button>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
@@ -798,78 +798,80 @@
         }
 
         function guardarOperacion() {
-            const editId = document.getElementById('input-edit-id').value;
-            const usuario = document.getElementById('input-usuario').value.trim() || 'N/A';
-            const referencia = document.getElementById('input-ref').value.trim() || 'N/A';
-            const estatus = document.getElementById('input-estatus').value;
-            const tipo = document.getElementById('input-tipo').value.toUpperCase();
-            const metodo = document.getElementById('input-metodo').value;
-            
-            const monto = parseFloat(document.getElementById('input-monto').value) || 0;
-            const comisionCripto = parseFloat(document.getElementById('input-comision-cripto').value) || 0;
-            let vesManual = parseFloat(document.getElementById('input-monto-ves-manual').value) || 0;
-            let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
+            try {
+                const editId = document.getElementById('input-edit-id').value;
+                const usuario = document.getElementById('input-usuario').value.trim() || 'N/A';
+                const referencia = document.getElementById('input-ref').value.trim() || 'N/A';
+                const estatus = document.getElementById('input-estatus').value;
+                const tipo = document.getElementById('input-tipo').value.toUpperCase();
+                const metodo = document.getElementById('input-metodo').value;
+                
+                const monto = parseFloat(document.getElementById('input-monto').value) || 0;
+                const comisionCripto = parseFloat(document.getElementById('input-comision-cripto').value) || 0;
+                let vesManual = parseFloat(document.getElementById('input-monto-ves-manual').value) || 0;
+                let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
 
-            if (monto <= 0) {
-                alert("Por favor, ingresa un Monto Cripto válido.");
-                return;
-            }
-
-            // Si no hay tasa pero hay monto VES manual, calcularla automáticamente
-            if (tasa <= 0 && vesManual > 0 && monto > 0) {
-                tasa = vesManual / monto;
-            }
-            
-            // Si no hay monto VES manual pero hay tasa, calcularlo
-            if (vesManual <= 0 && tasa > 0 && monto > 0) {
-                const montoEfectivoCripto = monto - comisionCripto;
-                vesManual = montoEfectivoCripto * tasa;
-            }
-
-            // Si de alguna manera ninguno de los dos se pudo calcular, asignamos un respaldo seguro
-            if (vesManual <= 0) {
-                vesManual = monto * (tasa > 0 ? tasa : 1);
-            }
-
-            let comisionBancaria = calcularComisionBancaria(tipo, metodo, vesManual);
-            let totalBsFinal = (tipo === 'COMPRA') ? (vesManual + comisionBancaria) : (vesManual - comisionBancaria);
-
-            if (editId) {
-                const index = operaciones.findIndex(o => o.id == editId);
-                if (index !== -1) {
-                    operaciones[index].usuario = usuario;
-                    operaciones[index].referencia = referencia;
-                    operaciones[index].estatus = estatus;
-                    operaciones[index].tipo = tipo;
-                    operaciones[index].metodo = metodo;
-                    operaciones[index].monto = monto;
-                    operaciones[index].tasa = tasa > 0 ? tasa : 1;
-                    operaciones[index].comisionCripto = comisionCripto;
-                    operaciones[index].montoBs = totalBsFinal;
+                if (monto <= 0) {
+                    alert("⚠️ Ingresa un Monto Cripto válido mayor a 0.");
+                    return;
                 }
-            } else {
-                const nuevaOp = {
-                    id: Date.now(),
-                    usuario, 
-                    referencia, 
-                    estatus, 
-                    tipo, 
-                    metodo, 
-                    monto, 
-                    tasa: tasa > 0 ? tasa : 1, 
-                    comisionCripto, 
-                    montoBs: totalBsFinal,
-                    fecha: fechaActualStr
-                };
-                operaciones.unshift(nuevaOp);
-            }
 
-            recalcularLotesMotor();
-            guardarDatos();
-            actualizarDashboard();
-            toggleModal(false);
-            document.getElementById('modal-detalle-op').style.display = 'none';
-            mostrarToast("✓ Operación guardada con éxito.");
+                if (tasa <= 0 && vesManual > 0) {
+                    tasa = vesManual / monto;
+                }
+                if (vesManual <= 0 && tasa > 0) {
+                    vesManual = (monto - comisionCripto) * tasa;
+                }
+                if (vesManual <= 0) {
+                    vesManual = monto * (tasa > 0 ? tasa : 1);
+                }
+
+                let comisionBancaria = calcularComisionBancaria(tipo, metodo, vesManual);
+                let totalBsFinal = (tipo === 'COMPRA') ? (vesManual + comisionBancaria) : (vesManual - comisionBancaria);
+
+                if (editId) {
+                    const index = operaciones.findIndex(o => o.id == editId);
+                    if (index !== -1) {
+                        operaciones[index].usuario = usuario;
+                        operaciones[index].referencia = referencia;
+                        operaciones[index].estatus = estatus;
+                        operaciones[index].tipo = tipo;
+                        operaciones[index].metodo = metodo;
+                        operaciones[index].monto = monto;
+                        operaciones[index].tasa = tasa > 0 ? tasa : 1;
+                        operaciones[index].comisionCripto = comisionCripto;
+                        operaciones[index].montoBs = totalBsFinal;
+                    }
+                } else {
+                    const nuevaOp = {
+                        id: Date.now(),
+                        usuario, 
+                        referencia, 
+                        estatus, 
+                        tipo, 
+                        metodo, 
+                        monto, 
+                        tasa: tasa > 0 ? tasa : 1, 
+                        comisionCripto, 
+                        montoBs: totalBsFinal,
+                        fecha: fechaActualStr
+                    };
+                    operaciones.unshift(nuevaOp);
+                }
+
+                recalcularLotesMotor();
+                guardarDatos();
+                actualizarDashboard();
+                toggleModal(false);
+                
+                const modalDetalle = document.getElementById('modal-detalle-op');
+                if (modalDetalle) modalDetalle.style.display = 'none';
+                
+                mostrarToast("✓ Operación guardada con éxito.");
+            } catch (err) {
+                console.error("Error al guardar:", err);
+                alert("Error al guardar: " + err.message);
+            }
         }
 
         function editarOp(id) {
@@ -1205,11 +1207,11 @@
                                 REF: <span style="color: #cbd5e1;">${op.referencia}</span> · ${loteBadgeHtml}
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px;" onclick="event.stopPropagation()">
-                                <button onclick="pedirConfirmacionMover(${op.id}, 'arriba')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem;" title="Subir">⬆️</button>
-                                <button onclick="pedirConfirmacionMover(${op.id}, 'abajo')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem;" title="Bajar">⬇️</button>
+                                <button type="button" onclick="pedirConfirmacionMover(${op.id}, 'arriba')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem;" title="Subir">⬆️</button>
+                                <button type="button" onclick="pedirConfirmacionMover(${op.id}, 'abajo')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem;" title="Bajar">⬇️</button>
                                 <span class="status-pill">● ${op.estatus}</span>
-                                <button onclick="editarOp(${op.id})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;" title="Editar">✏️</button>
-                                <button onclick="eliminarOp(${op.id})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;" title="Eliminar">🗑️</button>
+                                <button type="button" onclick="editarOp(${op.id})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;" title="Editar">✏️</button>
+                                <button type="button" onclick="eliminarOp(${op.id})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;" title="Eliminar">🗑️</button>
                             </div>
                         </div>
                     </div>
@@ -1295,7 +1297,7 @@
             document.getElementById('contenido-detalle-op').innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3 style="margin: 0; color: #fff; font-size: 1.1rem;">📄 Detalle de Operación</h3>
-                    <button onclick="document.getElementById('modal-detalle-op').style.display='none'" class="btn-modal-close">✕</button>
+                    <button type="button" onclick="document.getElementById('modal-detalle-op').style.display='none'" class="btn-modal-close">✕</button>
                 </div>
 
                 <div style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
@@ -1303,7 +1305,7 @@
                         <span style="font-size: 1rem; font-weight: bold;">${op.usuario}</span>
                         <div style="display:flex; gap:8px; align-items:center;">
                             <span class="tag-tipo" style="background:${colorTipo}20; color:${colorTipo};">${opTipoUpper}</span>
-                            <button onclick="editarOp(${op.id})" style="background:#1e2638; border:1px solid var(--card-border); color:var(--neon-blue); padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">✏️ Editar</button>
+                            <button type="button" onclick="editarOp(${op.id})" style="background:#1e2638; border:1px solid var(--card-border); color:var(--neon-blue); padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">✏️ Editar</button>
                         </div>
                     </div>
                     <div style="font-size: 0.8rem; color: var(--text-muted); display:flex; justify-content:space-between; margin-bottom:4px;">
