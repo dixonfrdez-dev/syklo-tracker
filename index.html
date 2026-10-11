@@ -337,7 +337,7 @@
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Ajustes</h3>
         <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px;">
             <div style="font-weight: bold; margin-bottom: 5px;">Comisión y Motor de Lotes</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Pagomóvil (0.30%, mín 14 VES), cálculo de ganancias por lote y control de pendientes.</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Pagomóvil (0.30%, mín 14 VES solo en compras), cálculo de ganancias por lote y control de pendientes.</div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -643,6 +643,7 @@
 
         function calcularComisionBancaria(tipoOp, metodoOp, montoBsVal) {
             let comision = 0.0;
+            // Comisión de Pago Móvil SOLO aplica si es una COMPRA
             if (tipoOp === 'COMPRA' && esPagoMovil(metodoOp)) {
                 let calculoPorcentaje = montoBsVal * 0.003;
                 comision = Math.max(14.0, calculoPorcentaje);
@@ -688,7 +689,9 @@
             }
             
             let comisionBancaria = calcularComisionBancaria(tipo, metodo, montoBs);
-            const total = (tipo === 'COMPRA') ? (montoBs + comisionBancaria) : (montoBs - comisionBancaria);
+            
+            // Si es COMPRA se suma la comisión, si es VENTA queda intacto el monto exacto
+            let total = (tipo === 'COMPRA') ? (montoBs + comisionBancaria) : (vesManual > 0 ? vesManual : montoBs);
 
             document.getElementById('modal-monto-bs').innerText = montoBs.toFixed(2);
             document.getElementById('modal-comision').innerText = comisionBancaria.toFixed(2);
@@ -786,7 +789,14 @@
                 montoBsExtraido = parseFloat(matchEnviadoVES[1].replace(/\./g, '').replace(',', '.'));
             }
 
-            if (montoBsExtraido > 0) {
+            const matchPrecio = texto.match(/precio:\s*([\d\.,]+)\s*VES/i);
+            if (matchPrecio) {
+                let precioExtraido = parseFloat(matchPrecio[1].replace(/\./g, '').replace(',', '.'));
+                document.getElementById('input-tasa').value = precioExtraido.toFixed(6);
+                if (montoUSDC > 0) {
+                    document.getElementById('input-monto-ves-manual').value = (precioExtraido * montoUSDC).toFixed(2);
+                }
+            } else if (montoBsExtraido > 0) {
                 document.getElementById('input-monto-ves-manual').value = montoBsExtraido.toFixed(2);
                 if (montoUSDC > 0) {
                     let tasaExacta = montoBsExtraido / montoUSDC;
@@ -816,14 +826,24 @@
                     return;
                 }
 
-                // Cálculo exacto de la Tasa Bruta
-                if (vesManual > 0 && monto > 0) {
+                if (tasa <= 0 && vesManual > 0) {
                     tasa = vesManual / monto;
-                } else if (tasa > 0 && vesManual <= 0) {
+                }
+                if (vesManual <= 0 && tasa > 0) {
                     vesManual = monto * tasa;
                 }
+                if (vesManual <= 0) {
+                    vesManual = monto * (tasa > 0 ? tasa : 1);
+                }
 
-                let totalBsFinal = vesManual > 0 ? vesManual : (monto * tasa);
+                let totalBsFinal = 0;
+                if (tipo === 'COMPRA') {
+                    let comisionBancaria = calcularComisionBancaria(tipo, metodo, vesManual);
+                    totalBsFinal = vesManual + comisionBancaria;
+                } else {
+                    // Ventas: se almacena el monto exacto en VES sin comisiones bancarias
+                    totalBsFinal = vesManual;
+                }
 
                 if (editId) {
                     const index = operaciones.findIndex(o => o.id == editId);
