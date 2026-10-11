@@ -287,7 +287,7 @@
 
     <!-- VISTA 2: RESUMEN VES -->
     <div id="view-resumen" class="view-section">
-        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Operaciones VES</h3>
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Operaciones VES del Día</h3>
         
         <div class="filter-bar">
             <label>BUSCAR por usuario o referencia:</label>
@@ -337,7 +337,7 @@
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Ajustes</h3>
         <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px;">
             <div style="font-weight: bold; margin-bottom: 5px;">Comisión y Motor de Lotes</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Asignación de fecha independiente por operación y control por día.</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Tablero y métricas filtradas por día seleccionado en el encabezado.</div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -473,7 +473,7 @@
     <div class="modal" id="modal-mover-op">
         <div class="modal-content" style="text-align: center;">
             <h3 style="color: #fff; margin-top: 0; font-size: 1.1rem;">Confirmar Movimiento</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">¿Estás seguro de que quieres cambiar el orden de esta operación? Esto recalculará todas las ganancias del día.</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">¿Estás seguro de que quieres cambiar el orden de esta operación?</p>
             <input type="hidden" id="mover-id-op" value="">
             <input type="hidden" id="mover-dir-op" value="">
             <div style="display: flex; gap: 10px;">
@@ -500,7 +500,7 @@
             </div>
 
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">HOY</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">DÍA SELECCIONADO</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-hoy-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-hoy-usdc">0.0000 USDC</div>
             </div>
@@ -568,7 +568,7 @@
         function abrirModalNuevaOp() {
             document.getElementById('modal-titulo-op').innerText = "Nueva Operación";
             document.getElementById('input-edit-id').value = "";
-            document.getElementById('input-fecha-op').value = fechaActualStr; // Toma por defecto la fecha que estás viendo arriba
+            document.getElementById('input-fecha-op').value = fechaActualStr;
             document.getElementById('input-usuario').value = "";
             document.getElementById('input-ref').value = "";
             document.getElementById('input-monto').value = "";
@@ -874,7 +874,7 @@
                         tasa: tasa > 0 ? tasa : 1, 
                         comisionCripto, 
                         montoBs: totalBsFinal,
-                        fecha: fechaOp // Se guarda con la fecha específica que seleccionaste en el formulario
+                        fecha: fechaOp
                     };
                     operaciones.unshift(nuevaOp);
                 }
@@ -1023,12 +1023,13 @@
         }
 
         function actualizarDashboard() {
+            // Operaciones exclusivamente del día seleccionado en el header
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
             const comprasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
+            const ventasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
 
             const gananciaDiaCripto = comprasDia.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
-            let gananciaDiaVes = 0;
-            comprasDia.forEach(op => { gananciaDiaVes += (op.gananciaVes || 0); });
+            const gananciaDiaVes = comprasDia.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
 
             document.getElementById('dash-ganancia-dia-usdc').innerHTML = gananciaDiaCripto.toFixed(4) + ' <span style="font-size: 1.1rem;">USDC</span>';
             document.getElementById('dash-ganancia-dia-ves').innerText = gananciaDiaVes.toFixed(2) + " VES";
@@ -1038,33 +1039,30 @@
             document.getElementById('meta-diaria-progreso').innerText = `${gananciaDiaCripto.toFixed(2)} / ${metaDiariaUSDC.toFixed(2)} USDC (Meta Día)`;
             document.getElementById('meta-diaria-pct').innerText = pctMeta.toFixed(0) + '%';
 
-            const comprasTotales = operaciones.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
-            const ventasTotales = operaciones.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
-
-            const promCompra = comprasTotales.length > 0 ? comprasTotales.reduce((acc, op) => acc + op.tasa, 0) / comprasTotales.length : 0;
-            const promVenta = ventasTotales.length > 0 ? ventasTotales.reduce((acc, op) => acc + op.tasa, 0) / ventasTotales.length : 0;
+            // Promedios y brecha calculados SOLO para el día seleccionado
+            const promCompra = comprasDia.length > 0 ? comprasDia.reduce((acc, op) => acc + op.tasa, 0) / comprasDia.length : 0;
+            const promVenta = ventasDia.length > 0 ? ventasDia.reduce((acc, op) => acc + op.tasa, 0) / ventasDia.length : 0;
             
             let brecha = 0;
             if (promCompra > 0 && promVenta > 0) {
                 brecha = ((promVenta - promCompra) / promCompra) * 100;
-            } else if (promCompra > 0) {
-                brecha = -100;
             }
 
-            const gananciaTotalCripto = comprasTotales.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
+            const comprasTotalesGlobal = operaciones.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
+            const ventasTotalesGlobal = operaciones.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
+            const gananciaTotalCripto = comprasTotalesGlobal.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
             const lotesAbiertos = lotes.filter(l => l.estado === 'ABIERTO').length;
 
             const totalRecompraPendiente = lotes.filter(l => l.estado === 'ABIERTO').reduce((acc, l) => acc + l.montoRestante, 0);
-            const totalComprasCripto = comprasTotales.reduce((acc, op) => acc + op.monto, 0);
-            const totalVentasCripto = ventasTotales.reduce((acc, op) => acc + op.monto, 0);
+            const totalComprasCripto = comprasTotalesGlobal.reduce((acc, op) => acc + op.monto, 0);
+            const totalVentasCripto = ventasTotalesGlobal.reduce((acc, op) => acc + op.monto, 0);
             const totalReventaPendiente = Math.max(0, totalComprasCripto - totalVentasCripto);
-
             const totalPendientesUSDC = totalRecompraPendiente + totalReventaPendiente;
 
             document.getElementById('dash-prom-compra').innerText = promCompra.toFixed(2);
             document.getElementById('dash-prom-venta').innerText = promVenta.toFixed(2);
             document.getElementById('dash-brecha').innerText = brecha.toFixed(2) + "%";
-            document.getElementById('dash-total-ops').innerText = operaciones.length;
+            document.getElementById('dash-total-ops').innerText = opsDelDia.length; // Cantidad de operaciones del día
             document.getElementById('dash-lotes').innerText = lotesAbiertos;
             document.getElementById('dash-ganancia-cripto').innerText = gananciaTotalCripto.toFixed(2);
             document.getElementById('dash-pendientes').innerText = totalPendientesUSDC.toFixed(2) + " USDC";
@@ -1150,7 +1148,6 @@
             const tipoFiltro = document.getElementById('filtro-tipo').value.toUpperCase();
             const metodoFiltro = document.getElementById('filtro-metodo').value;
 
-            // Filtramos las operaciones que coinciden con la fecha seleccionada en el header y los demás filtros
             const filtradas = operaciones.filter(op => {
                 const matchFecha = op.fecha === fechaActualStr;
                 const matchQ = op.usuario.toLowerCase().includes(q) || op.referencia.toLowerCase().includes(q);
