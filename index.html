@@ -599,7 +599,9 @@
             const vistaEl = document.getElementById('view-' + vista);
             if (vistaEl) vistaEl.classList.add('active');
             
-            if (elemento) elemento.classList.add('active');
+            if (elemento) {
+                elemento.classList.add('active');
+            }
         }
 
         function abrirModalNuevaOp() {
@@ -710,11 +712,15 @@
             const inputDate = document.getElementById('input-fecha-calendario');
             if (inputDate) {
                 inputDate.value = fechaActualStr;
-                if (inputDate.showPicker) {
-                    inputDate.showPicker();
-                } else {
-                    inputDate.click();
+                if (typeof inputDate.showPicker === 'function') {
+                    try {
+                        inputDate.showPicker();
+                        return;
+                    } catch (e) {
+                        // Fallback si el navegador restringe showPicker
+                    }
                 }
+                inputDate.click();
             }
         }
 
