@@ -337,7 +337,7 @@
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Ajustes</h3>
         <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px;">
             <div style="font-weight: bold; margin-bottom: 5px;">Comisión y Motor de Lotes</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Tablero y métricas filtradas por día seleccionado en el encabezado.</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Métricas e indicadores exclusivos del día seleccionado.</div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -1039,7 +1039,7 @@
             document.getElementById('meta-diaria-progreso').innerText = `${gananciaDiaCripto.toFixed(2)} / ${metaDiariaUSDC.toFixed(2)} USDC (Meta Día)`;
             document.getElementById('meta-diaria-pct').innerText = pctMeta.toFixed(0) + '%';
 
-            // Promedios y brecha calculados SOLO para el día seleccionado
+            // Promedios, brecha y operaciones calculados EXCLUSIVAMENTE para el día seleccionado
             const promCompra = comprasDia.length > 0 ? comprasDia.reduce((acc, op) => acc + op.tasa, 0) / comprasDia.length : 0;
             const promVenta = ventasDia.length > 0 ? ventasDia.reduce((acc, op) => acc + op.tasa, 0) / ventasDia.length : 0;
             
@@ -1062,7 +1062,7 @@
             document.getElementById('dash-prom-compra').innerText = promCompra.toFixed(2);
             document.getElementById('dash-prom-venta').innerText = promVenta.toFixed(2);
             document.getElementById('dash-brecha').innerText = brecha.toFixed(2) + "%";
-            document.getElementById('dash-total-ops').innerText = opsDelDia.length; // Cantidad de operaciones del día
+            document.getElementById('dash-total-ops').innerText = opsDelDia.length; // Operaciones exactas del día
             document.getElementById('dash-lotes').innerText = lotesAbiertos;
             document.getElementById('dash-ganancia-cripto').innerText = gananciaTotalCripto.toFixed(2);
             document.getElementById('dash-pendientes').innerText = totalPendientesUSDC.toFixed(2) + " USDC";
