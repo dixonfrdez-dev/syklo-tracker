@@ -588,8 +588,12 @@
         let metaDiariaUSDC = 10.0;
 
         document.addEventListener("DOMContentLoaded", () => {
-            cargarDatos();
-            actualizarTextoFechaHeader();
+            try {
+                cargarDatos();
+                actualizarTextoFechaHeader();
+            } catch (e) {
+                console.error("Error al iniciar:", e);
+            }
         });
 
         function cambiarVista(vista, elemento) {
@@ -1571,30 +1575,42 @@
         }
 
         function guardarDatos() {
-            const datosLimpios = operaciones.map(op => ({
-                id: op.id,
-                usuario: op.usuario,
-                referencia: op.referencia,
-                estatus: op.estatus,
-                tipo: op.tipo,
-                metodo: op.metodo,
-                monto: op.monto,
-                tasa: op.tasa,
-                comisionCripto: op.comisionCripto,
-                montoBs: op.montoBs,
-                fecha: op.fecha
-            }));
-            localStorage.setItem('syklo_tracker_data', JSON.stringify({ operaciones: datosLimpios, capitalInicial }));
+            try {
+                const datosLimpios = operaciones.map(op => ({
+                    id: op.id,
+                    usuario: op.usuario,
+                    referencia: op.referencia,
+                    estatus: op.estatus,
+                    tipo: op.tipo,
+                    metodo: op.metodo,
+                    monto: op.monto,
+                    tasa: op.tasa,
+                    comisionCripto: op.comisionCripto,
+                    montoBs: op.montoBs,
+                    fecha: op.fecha
+                }));
+                localStorage.setItem('syklo_tracker_data', JSON.stringify({ operaciones: datosLimpios, capitalInicial }));
+            } catch (e) {
+                console.error("Error al guardar en localStorage", e);
+            }
         }
 
         function cargarDatos() {
-            const data = localStorage.getItem('syklo_tracker_data');
-            if (data) {
-                const parsed = JSON.parse(data);
-                operaciones = parsed.operaciones || [];
-                capitalInicial = parsed.capitalInicial || 0;
-                const txtCapital = document.getElementById('txt-capital');
-                if(capitalInicial > 0 && txtCapital) txtCapital.innerText = capitalInicial + " VES registrado";
+            try {
+                const data = localStorage.getItem('syklo_tracker_data');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    operaciones = parsed.operaciones || [];
+                    capitalInicial = parsed.capitalInicial || 0;
+                    const txtCapital = document.getElementById('txt-capital');
+                    if(capitalInicial > 0 && txtCapital) txtCapital.innerText = capitalInicial + " VES registrado";
+                }
+                recalcularLotesMotor();
+                actualizarDashboard();
+            } catch (e) {
+                console.error("Error cargando datos, reiniciando estado", e);
+                operaciones = [];
+                capitalInicial = 0;
                 recalcularLotesMotor();
                 actualizarDashboard();
             }
