@@ -1073,7 +1073,7 @@
             mostrarToast("✓ Orden actualizado. Recalculando...");
         }
 
-                function recalcularLotesMotor() {
+                        function recalcularLotesMotor() {
             let lotesActivos = [];
             let contadorLote = 1;
             
@@ -1085,7 +1085,8 @@
                 op.lotesConsumidos = [];
             });
 
-            const opsCronologico = [...operaciones].reverse();
+            // Recorrer en orden cronológico real (de más antiguo a más nuevo)
+            const opsCronologico = [...operaciones].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
             opsCronologico.forEach(op => {
                 const tipoUpper = (op.tipo || '').toUpperCase();
@@ -1097,7 +1098,7 @@
                         montoRestante: op.monto,
                         estado: 'ABIERTO',
                         fecha: op.fecha,
-                        operacionVentaRef: op, // Referencia directa a la venta
+                        operacionVentaRef: op,
                         consumos: []
                     };
                     contadorLote++;
@@ -1116,7 +1117,6 @@
                             let gVes = difTasa * asignado;
                             let gUsdc = gVes / lote.tasaVenta;
 
-                            // Asignar las ganancias a la VENTA que abrió este lote
                             if (lote.operacionVentaRef) {
                                 lote.operacionVentaRef.gananciaVes = (lote.operacionVentaRef.gananciaVes || 0) + gVes;
                                 lote.operacionVentaRef.gananciaCripto = (lote.operacionVentaRef.gananciaCripto || 0) + gUsdc;
@@ -1148,6 +1148,7 @@
             lotes = lotesActivos;
             actualizarRatings();
         }
+
 
 
         function actualizarDashboard() {
