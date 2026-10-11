@@ -337,7 +337,7 @@
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Ajustes</h3>
         <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px;">
             <div style="font-weight: bold; margin-bottom: 5px;">Comisión y Motor de Lotes</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Pagomóvil (0.30%, mín 14 VES en compras), acumulación y cierre de lotes globales.</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Asignación automática a la fecha seleccionada en el encabezado.</div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -853,6 +853,7 @@
                         operaciones[index].tasa = tasa > 0 ? tasa : 1;
                         operaciones[index].comisionCripto = comisionCripto;
                         operaciones[index].montoBs = totalBsFinal;
+                        // Mantiene la fecha original o la actual si no la tenía
                     }
                 } else {
                     const nuevaOp = {
@@ -866,6 +867,7 @@
                         tasa: tasa > 0 ? tasa : 1, 
                         comisionCripto, 
                         montoBs: totalBsFinal,
+                        // Asigna la fecha seleccionada actualmente en el calendario superior
                         fecha: fechaActualStr
                     };
                     operaciones.unshift(nuevaOp);
@@ -952,7 +954,6 @@
                 op.lotesConsumidos = [];
             });
 
-            // Procesamos de forma estrictamente cronológica global (de más antiguo a más nuevo)
             const opsCronologico = [...operaciones].reverse();
 
             opsCronologico.forEach(op => {
@@ -1015,7 +1016,6 @@
         }
 
         function actualizarDashboard() {
-            // El dashboard suma la ganancia de las compras que ocurrieron EN LA FECHA ACTUAL, cerrando lotes globales
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
             const comprasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
 
