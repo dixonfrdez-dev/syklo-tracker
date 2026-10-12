@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Syklo P2P Tracker</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --bg-color: #0b0e14;
@@ -184,6 +190,25 @@
 </head>
 <body>
 
+    <!-- PANTALLA DE LOGIN -->
+    <div id="view-login" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+        <div class="neon-card" style="width: 100%; max-width: 400px; padding: 24px; text-align: center; cursor: default;">
+            <h2 style="color: var(--neon-blue); margin-top: 0;">Syklo P2P Tracker</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Inicia sesión para sincronizar tus datos</p>
+            
+            <div style="text-align: left; margin-bottom: 12px;">
+                <label style="font-size: 0.8rem; color: var(--text-muted);">Correo Electrónico</label>
+                <input type="email" id="login-email" placeholder="tu@correo.com" style="width: 100%; padding: 10px; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; color: white; margin-top: 4px;">
+            </div>
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label style="font-size: 0.8rem; color: var(--text-muted);">Contraseña</label>
+                <input type="password" id="login-password" placeholder="••••••••" style="width: 100%; padding: 10px; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; color: white; margin-top: 4px;">
+            </div>
+            
+            <button type="button" class="btn-submit" onclick="iniciarSesion()">Entrar / Registrarse</button>
+        </div>
+    </div>
+
     <div id="toast-aviso">✓ Operación guardada con éxito.</div>
 
     <!-- VISTA 1: DASHBOARD -->
@@ -191,11 +216,12 @@
         <div class="top-header">
             <div class="user-profile">
                 <div class="user-icon">👤</div>
-                <span id="header-user">dixonfrdez 🍀</span>
+                <span id="header-user">Syklo User</span>
             </div>
-            <div>
+            <div style="display: flex; gap: 8px; align-items: center;">
                 <input type="date" id="input-fecha-calendario" onchange="seleccionarFechaCalendario(this)">
                 <button type="button" class="date-btn" onclick="abrirCalendario()">📅 <span id="header-date">11/10/2026</span></button>
+                <button type="button" onclick="cerrarSesion()" style="background: rgba(255,82,82,0.1); border: 1px solid rgba(255,82,82,0.3); color: var(--accent-red); padding: 6px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; cursor: pointer;" title="Cerrar Sesión">🚪 Salir</button>
             </div>
         </div>
 
@@ -343,9 +369,9 @@
     <!-- VISTA 5: AJUSTES -->
     <div id="view-ajustes" class="view-section">
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Ajustes</h3>
-        <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px;">
-            <div style="font-weight: bold; margin-bottom: 5px;">Comisión y Motor de Lotes</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Métricas sincronizadas por fecha de operación.</div>
+        <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px; cursor: default;">
+            <div style="font-weight: bold; margin-bottom: 5px;">Sincronización en la Nube</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Tus datos se guardan y sincronizan automáticamente en tu cuenta.</div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -577,15 +603,73 @@
     </div>
 
     <script>
+        // Configuración de tu proyecto Firebase (Remplaza con tus datos reales)
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "tu-proyecto.firebaseapp.com",
+            projectId: "tu-proyecto",
+            storageBucket: "tu-proyecto.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let usuarioActualId = null;
         let operaciones = [];
         let lotes = [];
         let capitalInicial = 0;
         let fechaActualStr = new Date().toISOString().split('T')[0];
         let metaDiariaUSDC = 10.0;
 
+        // Escuchar estado de autenticación
+        auth.onAuthStateChanged((user) => {
+            const loginDiv = document.getElementById('view-login');
+            const headerUser = document.getElementById('header-user');
+            if (user) {
+                usuarioActualId = user.uid;
+                if (headerUser) headerUser.innerText = user.email.split('@')[0];
+                if (loginDiv) loginDiv.style.display = 'none';
+                cargarDatosNube();
+            } else {
+                usuarioActualId = null;
+                operaciones = [];
+                capitalInicial = 0;
+                if (loginDiv) loginDiv.style.display = 'flex';
+            }
+        });
+
+        function iniciarSesion() {
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value.trim();
+
+            if (!email || !pass) {
+                alert("Ingresa correo y contraseña.");
+                return;
+            }
+
+            auth.signInWithEmailAndPassword(email, pass)
+                .catch((error) => {
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-email') {
+                        return auth.createUserWithEmailAndPassword(email, pass);
+                    }
+                    throw error;
+                })
+                .catch((err) => {
+                    alert("Error de autenticación: " + err.message);
+                });
+        }
+
+        function cerrarSesion() {
+            auth.signOut().then(() => {
+                location.reload();
+            });
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             try {
-                cargarDatos();
                 actualizarTextoFechaHeader();
             } catch (e) {
                 console.error("Error al iniciar:", e);
@@ -1591,6 +1675,7 @@
         }
 
         function guardarDatos() {
+            if (!usuarioActualId) return;
             try {
                 const datosLimpios = operaciones.map(op => ({
                     id: op.id,
@@ -1605,31 +1690,35 @@
                     montoBs: op.montoBs,
                     fecha: op.fecha
                 }));
-                localStorage.setItem('syklo_tracker_data', JSON.stringify({ operaciones: datosLimpios, capitalInicial }));
+                db.collection("usuarios_datos").doc(usuarioActualId).set({
+                    operaciones: datosLimpios,
+                    capitalInicial: capitalInicial
+                }).catch((e) => {
+                    console.error("Error al sincronizar con la nube:", e);
+                });
             } catch (e) {
-                console.error("Error al guardar en localStorage", e);
+                console.error("Error al preparar datos", e);
             }
         }
 
-        function cargarDatos() {
-            try {
-                const data = localStorage.getItem('syklo_tracker_data');
-                if (data) {
-                    const parsed = JSON.parse(data);
-                    operaciones = parsed.operaciones || [];
-                    capitalInicial = parsed.capitalInicial || 0;
+        function cargarDatosNube() {
+            if (!usuarioActualId) return;
+            db.collection("usuarios_datos").doc(usuarioActualId).get().then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    operaciones = data.operaciones || [];
+                    capitalInicial = data.capitalInicial || 0;
                     const txtCapital = document.getElementById('txt-capital');
                     if(capitalInicial > 0 && txtCapital) txtCapital.innerText = capitalInicial + " VES registrado";
+                } else {
+                    operaciones = [];
+                    capitalInicial = 0;
                 }
                 recalcularLotesMotor();
                 actualizarDashboard();
-            } catch (e) {
-                console.error("Error cargando datos, reiniciando estado", e);
-                operaciones = [];
-                capitalInicial = 0;
-                recalcularLotesMotor();
-                actualizarDashboard();
-            }
+            }).catch((e) => {
+                console.error("Error al cargar de la nube", e);
+            });
         }
     </script>
 </body>
