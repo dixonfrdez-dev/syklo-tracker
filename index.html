@@ -534,19 +534,19 @@
             </div>
 
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">DÍA SELECCIONADO</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">🔆 HOY</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-hoy-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-hoy-usdc">0.0000 USDC</div>
             </div>
 
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">ESTA SEMANA</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">📅 ESTA SEMANA</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-sem-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-sem-usdc">0.0000 USDC</div>
             </div>
 
             <div class="neon-card" style="margin-bottom: 4px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">ESTE MES</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">📺 ESTE MES</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-mes-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-mes-usdc">0.0000 USDC</div>
             </div>
@@ -603,14 +603,13 @@
     </div>
 
     <script>
-        // Configuración de tu proyecto Firebase (Remplaza con tus datos reales)
         const firebaseConfig = {
-            apiKey: "AIzaSyBcL9gc3qDnhFjC7Lru5fQK3YbdMZ4vixI",
+            apiKey: "AIzaSyBcL9gc3qDnhFjC7Lru5fQK3YbdMZ4",
             authDomain: "syklotracker.firebaseapp.com",
             projectId: "syklotracker",
-            storageBucket: "syklotracker.firebasestorage.app",
+            storageBucket: "syklotracker.appspot.com",
             messagingSenderId: "496746853538",
-            appId: "1:496746853538:web:c7a5d53e9058a5c74653fb"
+            appId: "1:496746853538:web:c7a5d53e9058a5c74"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -624,7 +623,6 @@
         let fechaActualStr = new Date().toISOString().split('T')[0];
         let metaDiariaUSDC = 10.0;
 
-        // Escuchar estado de autenticación
         auth.onAuthStateChanged((user) => {
             const loginDiv = document.getElementById('view-login');
             const headerUser = document.getElementById('header-user');
@@ -746,9 +744,9 @@
                 return dOp >= inicioSemana && dOp <= fechaRef;
             });
 
-            const comprasSemana = opsSemana.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
-            const totalVes = comprasSemana.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
-            const totalUsdc = comprasSemana.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
+            const ventasSemana = opsSemana.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
+            const totalVes = ventasSemana.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
+            const totalUsdc = ventasSemana.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
 
             const contenido = document.getElementById('contenido-analisis-semanal');
             if (contenido) {
@@ -773,9 +771,9 @@
                 return yOp === yRef && mOp === mRef;
             });
 
-            const comprasMes = opsMes.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
-            const totalVes = comprasMes.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
-            const totalUsdc = comprasMes.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
+            const ventasMes = opsMes.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
+            const totalVes = ventasMes.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
+            const totalUsdc = ventasMes.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
 
             const contenido = document.getElementById('contenido-analisis-mensual');
             if (contenido) {
@@ -1280,7 +1278,7 @@
         }
 
         function actualizarCalculosResumenGanancias() {
-            const opsHoy = operaciones.filter(op => op.fecha === fechaActualStr && (op.tipo || '').toUpperCase() === 'COMPRA');
+            const opsHoy = operaciones.filter(op => op.fecha === fechaActualStr && (op.tipo || '').toUpperCase() === 'VENTA');
             const gHoyVes = opsHoy.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gHoyUsdc = opsHoy.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
 
@@ -1291,7 +1289,7 @@
             const opsSemana = operaciones.filter(op => {
                 if(!op.fecha) return false;
                 const dOp = new Date(op.fecha + 'T00:00:00');
-                return dOp >= inicioSemana && dOp <= fechaRef && (op.tipo || '').toUpperCase() === 'COMPRA';
+                return dOp >= inicioSemana && dOp <= fechaRef && (op.tipo || '').toUpperCase() === 'VENTA';
             });
             const gSemVes = opsSemana.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gSemUsdc = opsSemana.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
@@ -1300,7 +1298,7 @@
             const opsMes = operaciones.filter(op => {
                 if(!op.fecha) return false;
                 const [yOp, mOp] = op.fecha.split('-');
-                return yOp === yRef && mOp === mRef && (op.tipo || '').toUpperCase() === 'COMPRA';
+                return yOp === yRef && mOp === mRef && (op.tipo || '').toUpperCase() === 'VENTA';
             });
             const gMesVes = opsMes.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gMesUsdc = opsMes.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
