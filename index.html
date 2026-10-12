@@ -1085,7 +1085,6 @@
                 op.lotesConsumidos = [];
             });
 
-            // Mantiene el orden cronológico original (de más antiguo a más nuevo) sin alterar el orden del mismo día
             const opsCronologico = [...operaciones].reverse();
 
             opsCronologico.forEach(op => {
@@ -1149,13 +1148,11 @@
             actualizarRatings();
         }
 
-
-                function actualizarDashboard() {
+        function actualizarDashboard() {
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
             const comprasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
             const ventasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
 
-            // Las ganancias ahora se acumulan desde las VENTAS del día
             const gananciaDiaCripto = ventasDia.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
             const gananciaDiaVes = ventasDia.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
 
@@ -1197,7 +1194,6 @@
 
             filtrarHistorial();
         }
-
 
         function actualizarCalculosResumenGanancias() {
             const opsHoy = operaciones.filter(op => op.fecha === fechaActualStr && (op.tipo || '').toUpperCase() === 'COMPRA');
