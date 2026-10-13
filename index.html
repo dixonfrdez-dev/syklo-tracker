@@ -928,35 +928,28 @@
             }
         }
 
-        function procesarTextoInteligente(texto) {
-            const textoLower = texto.toLowerCase();
-            let esCompra = true;
+                    // Extracción inteligente de Monto VES del comprobante
+            let montoBsExtraido = 0;
+            const matchRecibidoVES = texto.match(/monto recibido:\s*([\d\.,]+)\s*VES/i) || texto.match(/operacion pagomovil bdv.*?([\d\.,]+)\s*Bs/i);
+            const matchEnviadoVES = texto.match(/monto enviado:\s*([\d\.,]+)\s*VES/i);
+            const matchMontoGenericoBs = texto.match(/([\d\.]+(?:,\d{2})?)\s*Bs/i);
 
-            const matchEnviado = textoLower.match(/monto enviado:\s*([\d\.,]+)\s*([a-z]+)/i);
-            const matchRecibido = textoLower.match(/monto recibido:\s*([\d\.,]+)\s*([a-z]+)/i);
+            if (matchRecibidoVES) {
+                montoBsExtraido = parseFloat(matchRecibidoVES[1].replace(/\./g, '').replace(',', '.'));
+            } else if (matchEnviadoVES) {
+                montoBsExtraido = parseFloat(matchEnviadoVES[1].replace(/\./g, '').replace(',', '.'));
+            } else if (matchMontoGenericoBs) {
+                montoBsExtraido = parseFloat(matchMontoGenericoBs[1].replace(/\./g, '').replace(',', '.'));
+            }
 
-            if (matchEnviado && matchRecibido) {
-                let unidadEnviada = matchEnviado[2].toUpperCase();
-                let unidadRecibida = matchRecibido[2].toUpperCase();
-                
-                if (unidadEnviada.includes('VES') || unidadEnviada.includes('BS')) {
-                    esCompra = true;
-                } else if (unidadEnviada.includes('USDC') || unidadEnviada.includes('USD')) {
-                    esCompra = false;
-                } else if (unidadRecibida.includes('VES') || unidadRecibida.includes('BS')) {
-                    esCompra = false;
-                } else {
-                    esCompra = true;
-                }
-            } else {
-                if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('venta')) {
-                    esCompra = false;
-                } else if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('compra')) {
-                    esCompra = true;
+            if (montoBsExtraido > 0) {
+                document.getElementById('input-monto-ves-manual').value = montoBsExtraido.toFixed(2);
+                if (montoUSDC > 0) {
+                    let tasaExacta = montoBsExtraido / montoUSDC;
+                    document.getElementById('input-tasa').value = tasaExacta.toFixed(6);
                 }
             }
 
-            document.getElementById('input-tipo').value = esCompra ? 'COMPRA' : 'VENTA';
 
             let usuarioEncontrado = "";
             const matchContraparte = texto.match(/Contraparte:\s*([^\n\r]+)/i);
