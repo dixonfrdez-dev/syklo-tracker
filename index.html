@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Syklo P2P Tracker</title>
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
     <style>
         :root {
             --bg-color: #0b0e14;
@@ -190,25 +184,6 @@
 </head>
 <body>
 
-    <!-- PANTALLA DE LOGIN -->
-    <div id="view-login" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
-        <div class="neon-card" style="width: 100%; max-width: 400px; padding: 24px; text-align: center; cursor: default;">
-            <h2 style="color: var(--neon-blue); margin-top: 0;">Syklo P2P Tracker</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Inicia sesión para sincronizar tus datos</p>
-            
-            <div style="text-align: left; margin-bottom: 12px;">
-                <label style="font-size: 0.8rem; color: var(--text-muted);">Correo Electrónico</label>
-                <input type="email" id="login-email" placeholder="tu@correo.com" style="width: 100%; padding: 10px; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; color: white; margin-top: 4px;">
-            </div>
-            <div style="text-align: left; margin-bottom: 20px;">
-                <label style="font-size: 0.8rem; color: var(--text-muted);">Contraseña</label>
-                <input type="password" id="login-password" placeholder="••••••••" style="width: 100%; padding: 10px; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; color: white; margin-top: 4px;">
-            </div>
-            
-            <button type="button" class="btn-submit" onclick="iniciarSesion()">Entrar / Registrarse</button>
-        </div>
-    </div>
-
     <div id="toast-aviso">✓ Operación guardada con éxito.</div>
 
     <!-- VISTA 1: DASHBOARD -->
@@ -216,12 +191,11 @@
         <div class="top-header">
             <div class="user-profile">
                 <div class="user-icon">👤</div>
-                <span id="header-user">Syklo User</span>
+                <span id="header-user">dixonfrdez 🍀</span>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
+            <div>
                 <input type="date" id="input-fecha-calendario" onchange="seleccionarFechaCalendario(this)">
                 <button type="button" class="date-btn" onclick="abrirCalendario()">📅 <span id="header-date">11/10/2026</span></button>
-                <button type="button" onclick="cerrarSesion()" style="background: rgba(255,82,82,0.1); border: 1px solid rgba(255,82,82,0.3); color: var(--accent-red); padding: 6px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; cursor: pointer;" title="Cerrar Sesión">🚪 Salir</button>
             </div>
         </div>
 
@@ -369,9 +343,9 @@
     <!-- VISTA 5: AJUSTES -->
     <div id="view-ajustes" class="view-section">
         <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--neon-blue);">Ajustes</h3>
-        <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px; cursor: default;">
-            <div style="font-weight: bold; margin-bottom: 5px;">Sincronización en la Nube</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Tus datos se guardan y sincronizan automáticamente en tu cuenta.</div>
+        <div class="neon-card" style="text-align: left; padding: 15px; margin-bottom: 10px;">
+            <div style="font-weight: bold; margin-bottom: 5px;">Comisión y Motor de Lotes</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Métricas sincronizadas por fecha de operación.</div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -534,19 +508,19 @@
             </div>
 
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">🔆 HOY</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">DÍA SELECCIONADO</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-hoy-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-hoy-usdc">0.0000 USDC</div>
             </div>
 
             <div class="neon-card" style="margin-bottom: 12px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">📅 ESTA SEMANA</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">ESTA SEMANA</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-sem-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-sem-usdc">0.0000 USDC</div>
             </div>
 
             <div class="neon-card" style="margin-bottom: 4px; cursor: default; padding: 14px; text-align: center;">
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">📺 ESTE MES</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">ESTE MES</div>
                 <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-green);" id="res-ganancia-mes-ves">0.00 VES</div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;" id="res-ganancia-mes-usdc">0.0000 USDC</div>
             </div>
@@ -603,71 +577,15 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBcL9gc3qDnhFjC7Lru5fQK3YbdMZ4vixI",
-            authDomain: "syklotracker.firebaseapp.com",
-            projectId: "syklotracker",
-            storageBucket: "syklotracker.firebasestorage.app",
-            messagingSenderId: "496746853538",
-            appId: "1:496746853538:web:c7a5d53e9058a5c74653fb"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        let usuarioActualId = null;
         let operaciones = [];
         let lotes = [];
         let capitalInicial = 0;
         let fechaActualStr = new Date().toISOString().split('T')[0];
         let metaDiariaUSDC = 10.0;
 
-        auth.onAuthStateChanged((user) => {
-            const loginDiv = document.getElementById('view-login');
-            const headerUser = document.getElementById('header-user');
-            if (user) {
-                usuarioActualId = user.uid;
-                if (headerUser) headerUser.innerText = user.email.split('@')[0];
-                if (loginDiv) loginDiv.style.display = 'none';
-                cargarDatosNube();
-            } else {
-                usuarioActualId = null;
-                operaciones = [];
-                capitalInicial = 0;
-                if (loginDiv) loginDiv.style.display = 'flex';
-            }
-        });
-
-        function iniciarSesion() {
-            const email = document.getElementById('login-email').value.trim();
-            const pass = document.getElementById('login-password').value.trim();
-
-            if (!email || !pass) {
-                alert("Ingresa correo y contraseña.");
-                return;
-            }
-
-            auth.signInWithEmailAndPassword(email, pass)
-                .catch((error) => {
-                    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-email') {
-                        return auth.createUserWithEmailAndPassword(email, pass);
-                    }
-                    throw error;
-                })
-                .catch((err) => {
-                    alert("Error de autenticación: " + err.message);
-                });
-        }
-
-        function cerrarSesion() {
-            auth.signOut().then(() => {
-                location.reload();
-            });
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
             try {
+                cargarDatos();
                 actualizarTextoFechaHeader();
             } catch (e) {
                 console.error("Error al iniciar:", e);
@@ -744,9 +662,9 @@
                 return dOp >= inicioSemana && dOp <= fechaRef;
             });
 
-            const ventasSemana = opsSemana.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
-            const totalVes = ventasSemana.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
-            const totalUsdc = ventasSemana.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
+            const comprasSemana = opsSemana.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
+            const totalVes = comprasSemana.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
+            const totalUsdc = comprasSemana.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
 
             const contenido = document.getElementById('contenido-analisis-semanal');
             if (contenido) {
@@ -771,9 +689,9 @@
                 return yOp === yRef && mOp === mRef;
             });
 
-            const ventasMes = opsMes.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
-            const totalVes = ventasMes.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
-            const totalUsdc = ventasMes.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
+            const comprasMes = opsMes.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
+            const totalVes = comprasMes.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
+            const totalUsdc = comprasMes.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
 
             const contenido = document.getElementById('contenido-analisis-mensual');
             if (contenido) {
@@ -928,28 +846,35 @@
             }
         }
 
-                    // Extracción inteligente de Monto VES del comprobante
-            let montoBsExtraido = 0;
-            const matchRecibidoVES = texto.match(/monto recibido:\s*([\d\.,]+)\s*VES/i) || texto.match(/operacion pagomovil bdv.*?([\d\.,]+)\s*Bs/i);
-            const matchEnviadoVES = texto.match(/monto enviado:\s*([\d\.,]+)\s*VES/i);
-            const matchMontoGenericoBs = texto.match(/([\d\.]+(?:,\d{2})?)\s*Bs/i);
+        function procesarTextoInteligente(texto) {
+            const textoLower = texto.toLowerCase();
+            let esCompra = true;
 
-            if (matchRecibidoVES) {
-                montoBsExtraido = parseFloat(matchRecibidoVES[1].replace(/\./g, '').replace(',', '.'));
-            } else if (matchEnviadoVES) {
-                montoBsExtraido = parseFloat(matchEnviadoVES[1].replace(/\./g, '').replace(',', '.'));
-            } else if (matchMontoGenericoBs) {
-                montoBsExtraido = parseFloat(matchMontoGenericoBs[1].replace(/\./g, '').replace(',', '.'));
-            }
+            const matchEnviado = textoLower.match(/monto enviado:\s*([\d\.,]+)\s*([a-z]+)/i);
+            const matchRecibido = textoLower.match(/monto recibido:\s*([\d\.,]+)\s*([a-z]+)/i);
 
-            if (montoBsExtraido > 0) {
-                document.getElementById('input-monto-ves-manual').value = montoBsExtraido.toFixed(2);
-                if (montoUSDC > 0) {
-                    let tasaExacta = montoBsExtraido / montoUSDC;
-                    document.getElementById('input-tasa').value = tasaExacta.toFixed(6);
+            if (matchEnviado && matchRecibido) {
+                let unidadEnviada = matchEnviado[2].toUpperCase();
+                let unidadRecibida = matchRecibido[2].toUpperCase();
+                
+                if (unidadEnviada.includes('VES') || unidadEnviada.includes('BS')) {
+                    esCompra = true;
+                } else if (unidadEnviada.includes('USDC') || unidadEnviada.includes('USD')) {
+                    esCompra = false;
+                } else if (unidadRecibida.includes('VES') || unidadRecibida.includes('BS')) {
+                    esCompra = false;
+                } else {
+                    esCompra = true;
+                }
+            } else {
+                if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('venta')) {
+                    esCompra = false;
+                } else if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('compra')) {
+                    esCompra = true;
                 }
             }
 
+            document.getElementById('input-tipo').value = esCompra ? 'COMPRA' : 'VENTA';
 
             let usuarioEncontrado = "";
             const matchContraparte = texto.match(/Contraparte:\s*([^\n\r]+)/i);
@@ -1160,6 +1085,7 @@
                 op.lotesConsumidos = [];
             });
 
+            // Mantiene el orden cronológico original (de más antiguo a más nuevo) sin alterar el orden del mismo día
             const opsCronologico = [...operaciones].reverse();
 
             opsCronologico.forEach(op => {
@@ -1223,11 +1149,13 @@
             actualizarRatings();
         }
 
-        function actualizarDashboard() {
+
+                function actualizarDashboard() {
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
             const comprasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'COMPRA');
             const ventasDia = opsDelDia.filter(op => (op.tipo || '').toUpperCase() === 'VENTA');
 
+            // Las ganancias ahora se acumulan desde las VENTAS del día
             const gananciaDiaCripto = ventasDia.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
             const gananciaDiaVes = ventasDia.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
 
@@ -1270,8 +1198,9 @@
             filtrarHistorial();
         }
 
+
         function actualizarCalculosResumenGanancias() {
-            const opsHoy = operaciones.filter(op => op.fecha === fechaActualStr && (op.tipo || '').toUpperCase() === 'VENTA');
+            const opsHoy = operaciones.filter(op => op.fecha === fechaActualStr && (op.tipo || '').toUpperCase() === 'COMPRA');
             const gHoyVes = opsHoy.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gHoyUsdc = opsHoy.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
 
@@ -1282,7 +1211,7 @@
             const opsSemana = operaciones.filter(op => {
                 if(!op.fecha) return false;
                 const dOp = new Date(op.fecha + 'T00:00:00');
-                return dOp >= inicioSemana && dOp <= fechaRef && (op.tipo || '').toUpperCase() === 'VENTA';
+                return dOp >= inicioSemana && dOp <= fechaRef && (op.tipo || '').toUpperCase() === 'COMPRA';
             });
             const gSemVes = opsSemana.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gSemUsdc = opsSemana.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
@@ -1291,7 +1220,7 @@
             const opsMes = operaciones.filter(op => {
                 if(!op.fecha) return false;
                 const [yOp, mOp] = op.fecha.split('-');
-                return yOp === yRef && mOp === mRef && (op.tipo || '').toUpperCase() === 'VENTA';
+                return yOp === yRef && mOp === mRef && (op.tipo || '').toUpperCase() === 'COMPRA';
             });
             const gMesVes = opsMes.reduce((acc, op) => acc + (op.gananciaVes || 0), 0);
             const gMesUsdc = opsMes.reduce((acc, op) => acc + (op.gananciaCripto || 0), 0);
@@ -1666,7 +1595,6 @@
         }
 
         function guardarDatos() {
-            if (!usuarioActualId) return;
             try {
                 const datosLimpios = operaciones.map(op => ({
                     id: op.id,
@@ -1681,35 +1609,31 @@
                     montoBs: op.montoBs,
                     fecha: op.fecha
                 }));
-                db.collection("usuarios_datos").doc(usuarioActualId).set({
-                    operaciones: datosLimpios,
-                    capitalInicial: capitalInicial
-                }).catch((e) => {
-                    console.error("Error al sincronizar con la nube:", e);
-                });
+                localStorage.setItem('syklo_tracker_data', JSON.stringify({ operaciones: datosLimpios, capitalInicial }));
             } catch (e) {
-                console.error("Error al preparar datos", e);
+                console.error("Error al guardar en localStorage", e);
             }
         }
 
-        function cargarDatosNube() {
-            if (!usuarioActualId) return;
-            db.collection("usuarios_datos").doc(usuarioActualId).get().then((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    operaciones = data.operaciones || [];
-                    capitalInicial = data.capitalInicial || 0;
+        function cargarDatos() {
+            try {
+                const data = localStorage.getItem('syklo_tracker_data');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    operaciones = parsed.operaciones || [];
+                    capitalInicial = parsed.capitalInicial || 0;
                     const txtCapital = document.getElementById('txt-capital');
                     if(capitalInicial > 0 && txtCapital) txtCapital.innerText = capitalInicial + " VES registrado";
-                } else {
-                    operaciones = [];
-                    capitalInicial = 0;
                 }
                 recalcularLotesMotor();
                 actualizarDashboard();
-            }).catch((e) => {
-                console.error("Error al cargar de la nube", e);
-            });
+            } catch (e) {
+                console.error("Error cargando datos, reiniciando estado", e);
+                operaciones = [];
+                capitalInicial = 0;
+                recalcularLotesMotor();
+                actualizarDashboard();
+            }
         }
     </script>
 </body>
