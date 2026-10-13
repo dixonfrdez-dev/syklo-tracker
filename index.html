@@ -893,46 +893,100 @@
             let montoUSDC = 0;
             const matchRecibidoUSDCVal = texto.match(/monto recibido:\s*(\d+([.,]\d+)?)\s*USDC/i);
             const matchEnviadoUSDCVal = texto.match(/monto enviado:\s*(\d+([.,]\d+)?)\s*USDC/i);
-            const matchUSDCGeneral = texto.match(/(\d+([.,]\d+)?)\s*USDC/i);
+function procesarTextoInteligente(texto) {
+    const textoLower = texto.toLowerCase();
+    let esCompra = true;
 
-            if (matchRecibidoUSDCVal) {
-                montoUSDC = parseFloat(matchRecibidoUSDCVal[1].replace(',', '.'));
-            } else if (matchEnviadoUSDCVal) {
-                montoUSDC = parseFloat(matchEnviadoUSDCVal[1].replace(',', '.'));
-            } else if (matchUSDCGeneral) {
-                montoUSDC = parseFloat(matchUSDCGeneral[1].replace(',', '.'));
-            }
-            
-            if (montoUSDC > 0) {
-                document.getElementById('input-monto').value = montoUSDC;
-            }
+    if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('venta')) {
+        esCompra = false;
+    } else if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('compra')) {
+        esCompra = true;
+    }
+    document.getElementById('input-tipo').value = esCompra ? 'COMPRA' : 'VENTA';
 
-            let montoBsExtraido = 0;
-            const matchRecibidoVES = texto.match(/monto recibido:\s*([\d\.,]+)\s*VES/i);
-            const matchEnviadoVES = texto.match(/monto enviado:\s*([\d\.,]+)\s*VES/i);
-            if (matchRecibidoVES) {
-                montoBsExtraido = parseFloat(matchRecibidoVES[1].replace(/\./g, '').replace(',', '.'));
-            } else if (matchEnviadoVES) {
-                montoBsExtraido = parseFloat(matchEnviadoVES[1].replace(/\./g, '').replace(',', '.'));
-            }
+    let usuarioEncontrado = "";
+    const matchContraparte = texto.match(/Contraparte:\s*([^\n\r]+)/i);
+    if (matchContraparte) {
+        usuarioEncontrado = matchContraparte[1].replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+    }
+    if (usuarioEncontrado) {
+        document.getElementById('input-usuario').value = usuarioEncontrado;
+    }
 
-            const matchPrecio = texto.match(/precio:\s*([\d\.,]+)\s*VES/i);
-            if (matchPrecio) {
-                let precioExtraido = parseFloat(matchPrecio[1].replace(/\./g, '').replace(',', '.'));
-                document.getElementById('input-tasa').value = precioExtraido.toFixed(6);
-                if (montoUSDC > 0) {
-                    document.getElementById('input-monto-ves-manual').value = (precioExtraido * montoUSDC).toFixed(2);
-                }
-            } else if (montoBsExtraido > 0) {
-                document.getElementById('input-monto-ves-manual').value = montoBsExtraido.toFixed(2);
-                if (montoUSDC > 0) {
-                    let tasaExacta = montoBsExtraido / montoUSDC;
-                    document.getElementById('input-tasa').value = tasaExacta.toFixed(6);
-                }
-            }
+    const matchRef = texto.match(/([a-f0-9]{8}|[A-Z0-9]{6,12})/i);
+    if (matchRef) {
+        document.getElementById('input-ref').value = matchRef[1];
+    }
 
-            calcularTotalesModal();
+    let montoUSDC = 0;
+    const matchRecibidoUSDCVal = texto.match(/monto recibido:\s*(\d+([.,]\d+)?)\s*USDC/i);
+    const matchEnviadoUSDCVal = texto.match(/monto enviado:\s*(\d+([.,]\d+)?)\s*USDC/i);
+    const matchUSDCGeneral = texto.match(/(\d+([.,]\d+)?)\s*USDC/i);
+
+    if (matchRecibidoUSDCVal) {
+        montoUSDC = parseFloat(matchRecibidoUSDCVal[1].replace(',', '.'));
+    } else if (matchEnviadoUSDCVal) {
+        montoUSDC = parseFloat(matchEnviadoUSDCVal[1].replace(',', '.'));
+    } else if (matchUSDCGeneral) {
+        montoUSDC = parseFloat(matchUSDCGeneral[1].replace(',', '.'));
+    }
+    
+    if (montoUSDC > 0) {
+        document.getElementById('input-monto').value = montoUSDC;
+    }
+
+    let montoBsExtraido = 0;
+    const matchRecibidoVES = texto.match(/monto recibido:\s*([\d\.,]+)\s*VES/i);
+    const matchEnviadoVES = texto.match(/monto enviado:\s*([\d\.,]+)\s*VES/i);
+    if (matchRecibidoVES) {
+        montoBsExtraido = parseFloat(matchRecibidoVES[1].replace(/\./g, '').replace(',', '.'));
+    } else if (matchEnviadoVES) {
+        montoBsExtraido = parseFloat(matchEnviadoVES[1].replace(/\./g, '').replace(',', '.'));
+    }
+
+    if (montoBsExtraido > 0) {
+        document.getElementById('input-monto-ves-manual').value = montoBsExtraido.toFixed(2);
+        if (montoUSDC > 0) {
+            let tasaExacta = montoBsExtraido / montoUSDC;
+            document.getElementById('input-tasa').value = tasaExacta.toFixed(6);
         }
+    } else {
+        const matchPrecio = texto.match(/precio:\s*([\d\.,]+)\s*VES/i);
+        if (matchPrecio) {
+            let precioExtraido = parseFloat(matchPrecio[1].replace(/\./g, '').replace(',', '.'));
+            document.getElementById('input-tasa').value = precioExtraido.toFixed(6);
+            if (montoUSDC > 0) {
+                document.getElementById('input-monto-ves-manual').value = (precioExtraido * montoUSDC).toFixed(2);
+            }
+        }
+    }
+
+    calcularTotalesModal();
+}
+
+function alCambiarMontoVESManual() {
+    const montoVesManual = parseFloat(document.getElementById('input-monto-ves-manual').value) || 0;
+    const montoUSDC = parseFloat(document.getElementById('input-monto').value) || 0;
+
+    if (montoVesManual > 0 && montoUSDC > 0) {
+        const tasaCalc = montoVesManual / montoUSDC;
+        // Evitamos que dispare bucles indeseados actualizando directo sin reescribir mal
+        const inputTasa = document.getElementById('input-tasa');
+        if(inputTasa) inputTasa.value = tasaCalc.toFixed(6);
+    }
+    calcularTotalesModal();
+}
+
+function alCambiarTasaOUSDC() {
+    let tasa = parseFloat(document.getElementById('input-tasa').value) || 0;
+    const montoUSDC = parseFloat(document.getElementById('input-monto').value) || 0;
+    if (tasa > 0 && montoUSDC > 0) {
+        const inputVes = document.getElementById('input-monto-ves-manual');
+        if(inputVes) inputVes.value = (tasa * montoUSDC).toFixed(2);
+    }
+    calcularTotalesModal();
+}
+
 
         function guardarOperacion() {
             try {
