@@ -600,14 +600,13 @@
 
     <script>
         const firebaseConfig = {
-    apiKey: "AIzaSyBcL9gc3qDnhFjC7Lru5fQK3YbdMZ4vixI",
-    authDomain: "syklotracker.firebaseapp.com",
-    projectId: "syklotracker",
-    storageBucket: "syklotracker.firebasestorage.app",
-    messagingSenderId: "496746853538",
-    appId: "1:496746853538:web:c7a5d53e9058a5c74653fb"
-};
-
+            apiKey: "AIzaSyBcL9gc3qDnhFjC7Lru5fQK3YbdMZ4",
+            authDomain: "syklotracker.firebaseapp.com",
+            projectId: "syklotracker",
+            storageBucket: "syklotracker.appspot.com",
+            messagingSenderId: "496746853538",
+            appId: "1:496746853538:web:c7a5d53e9058a5c74"
+        };
 
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -927,7 +926,7 @@
             }
         }
 
-                function procesarTextoInteligente(texto) {
+        function procesarTextoInteligente(texto) {
             const textoLower = texto.toLowerCase();
             let esCompra = true;
 
@@ -990,62 +989,6 @@
 
             calcularTotalesModal();
         }
-
-    let usuarioEncontrado = "";
-    const matchContraparte = texto.match(/Contraparte:\s*([^\n\r]+)/i);
-    if (matchContraparte) {
-        usuarioEncontrado = matchContraparte[1].replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
-    }
-    if (usuarioEncontrado) {
-        document.getElementById('input-usuario').value = usuarioEncontrado;
-    }
-
-    const matchRef = texto.match(/([a-f0-9]{8}|[A-Z0-9]{6,12})/i);
-    if (matchRef) {
-        document.getElementById('input-ref').value = matchRef[1];
-    }
-
-    let montoUSDC = 0;
-    const matchRecibidoUSDCVal = texto.match(/monto recibido:\s*(\d+([.,]\d+)?)\s*USDC/i);
-    const matchEnviadoUSDCVal = texto.match(/monto enviado:\s*(\d+([.,]\d+)?)\s*USDC/i);
-    const matchUSDCGeneral = texto.match(/(\d+([.,]\d+)?)\s*USDC/i);
-
-    if (matchRecibidoUSDCVal) {
-        montoUSDC = parseFloat(matchRecibidoUSDCVal[1].replace(',', '.'));
-    } else if (matchEnviadoUSDCVal) {
-        montoUSDC = parseFloat(matchEnviadoUSDCVal[1].replace(',', '.'));
-    } else if (matchUSDCGeneral) {
-        montoUSDC = parseFloat(matchUSDCGeneral[1].replace(',', '.'));
-    }
-    
-    if (montoUSDC > 0) {
-        document.getElementById('input-monto').value = montoUSDC;
-    }
-
-    // 1. Extraer PRIMERO el precio/tasa oficial del P2P ("Precio: 989 VES")
-    const matchPrecio = texto.match(/precio:\s*([\d\.,]+)\s*VES/i);
-    if (matchPrecio) {
-        let precioExtraido = parseFloat(matchPrecio[1].replace(/\./g, '').replace(',', '.'));
-        document.getElementById('input-tasa').value = precioExtraido.toFixed(2);
-    }
-
-    // 2. Extraer el Monto Exacto recibido/enviado en VES ("Monto recibido: 991,98 VES")
-    let montoBsExtraido = 0;
-    const matchRecibidoVES = texto.match(/monto recibido:\s*([\d\.,]+)\s*VES/i);
-    const matchEnviadoVES = texto.match(/monto enviado:\s*([\d\.,]+)\s*VES/i);
-    if (matchRecibidoVES) {
-        montoBsExtraido = parseFloat(matchRecibidoVES[1].replace(/\./g, '').replace(',', '.'));
-    } else if (matchEnviadoVES) {
-        montoBsExtraido = parseFloat(matchEnviadoVES[1].replace(/\./g, '').replace(',', '.'));
-    }
-
-    if (montoBsExtraido > 0) {
-        document.getElementById('input-monto-ves-manual').value = montoBsExtraido.toFixed(2);
-    }
-
-    calcularTotalesModal();
-}
-
 
         function guardarOperacion() {
             try {
