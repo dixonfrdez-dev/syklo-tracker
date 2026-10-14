@@ -1675,31 +1675,32 @@
             }
         }
 
-        function cargarDatosNube() {
-            if (!usuarioActualId) return;
-            db.collection("usuarios_datos").doc(usuarioActualId).get().then((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    operaciones = data.operaciones || [];
-                    capitalInicial = data.capitalInicial || 0;
-                    const txtCapital = document.getElementById('txt-capital');
-                    if(capitalInicial > 0 && txtCapital) txtCapital.innerText = capitalInicial + " VES registrado";
-                } else {
-                    operaciones = [];
-                    capitalInicial = 0;
-                }
-                recalcularLotesMotor();
-                actualizarDashboard();
-            }).catch((e) => {
-                console.error("Error al cargar de la nube", e);
-            });
+            function cargarDatosNube() {
+      if (!usuarioActualId) return;
+      db.collection("usuarios_datos").doc(usuarioActualId).get().then((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          operaciones = data.operaciones || [];
+          capitalInicial = data.capitalInicial || 0;
+        } else {
+          operaciones = [];
+          capitalInicial = 0;
         }
-        <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('Service Worker registrado', reg))
-      .catch(err => console.error('Error al registrar Service Worker', err));
-  }
-</script>
+        recalcularLotesMotor();
+        actualizarDashboard();
+      }).catch((e) => {
+        console.error("Error al cargar de la nube:", e);
+      });
+    }
+  </script>
+
+  <!-- Service Worker para la PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker registrado', reg))
+        .catch(err => console.error('Error al registrar Service Worker', err));
+    }
+  </script>
 </body>
 </html>
