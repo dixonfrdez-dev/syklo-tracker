@@ -927,13 +927,22 @@
         }
 
         function procesarTextoInteligente(texto) {
-            const textoLower = texto.toLowerCase();
-            let esCompra = true;
+    const textoLower = texto.toLowerCase();
+    let esCompra = true;
 
-            if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('venta')) {
-                esCompra = false;
-            } else if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('compra')) {
-                esCompra = true;
+    // Buscamos palabras clave directas en lugar de frases muy largas
+    if (textoLower.includes('venta') || textoLower.includes('has vendido')) {
+        esCompra = false;
+    } else if (textoLower.includes('compra') || textoLower.includes('has comprado')) {
+        esCompra = true;
+    }
+
+    // Aseguramos que se asigne correctamente el valor al selector (puede ser 'COMPRA' o 'VENTA')
+    const selectTipo = document.getElementById('input-tipo');
+    if (selectTipo) {
+        selectTipo.value = esCompra ? 'COMPRA' : 'VENTA';
+    }
+
             }
             document.getElementById('input-tipo').value = esCompra ? 'COMPRA' : 'VENTA';
 
