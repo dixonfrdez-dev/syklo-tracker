@@ -1105,11 +1105,12 @@
             document.getElementById('modal-mover-op').style.display = 'none';
         }
 
-        function ejecutarMovimientoOp() {
+                function ejecutarMovimientoOp() {
             const id = parseInt(document.getElementById('mover-id-op').value);
             const direccion = document.getElementById('mover-dir-op').value;
             cerrarModalMover();
 
+            // Buscamos directamente en el arreglo global de operaciones usando el ID único
             const index = operaciones.findIndex(o => o.id === id);
             if (index === -1) return;
 
@@ -1128,6 +1129,7 @@
             actualizarDashboard();
             mostrarToast("✓ Orden actualizado. Recalculando...");
         }
+
         
         function recalcularLotesMotor() {
             let lotesActivos = [];
