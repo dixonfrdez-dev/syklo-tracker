@@ -927,17 +927,13 @@
         }
 
         function procesarTextoInteligente(texto) {
-    const textoLower = texto.toLowerCase();
-    let esCompra = true;
+            const textoLower = texto.toLowerCase();
+            let esCompra = true;
 
-    // Buscamos palabras clave directas en lugar de frases muy largas
-    if (textoLower.includes('venta') || textoLower.includes('has vendido')) {
-        esCompra = false;
-    } else if (textoLower.includes('compra') || textoLower.includes('has comprado')) {
-        esCompra = true;
-    }
-
-
+            if (textoLower.includes('has vendido') || textoLower.includes('vendido') || textoLower.includes('venta')) {
+                esCompra = false;
+            } else if (textoLower.includes('has comprado') || textoLower.includes('comprado') || textoLower.includes('compra')) {
+                esCompra = true;
             }
             document.getElementById('input-tipo').value = esCompra ? 'COMPRA' : 'VENTA';
 
@@ -1109,7 +1105,7 @@
             document.getElementById('modal-mover-op').style.display = 'none';
         }
 
-                        function ejecutarMovimientoOp() {
+        function ejecutarMovimientoOp() {
             const id = parseInt(document.getElementById('mover-id-op').value);
             const direccion = document.getElementById('mover-dir-op').value;
             cerrarModalMover();
@@ -1117,7 +1113,6 @@
             const index = operaciones.findIndex(o => o.id === id);
             if (index === -1) return;
 
-            // Intercambiamos la posición directamente en el arreglo global de operaciones
             if (direccion === 'arriba' && index > 0) {
                 const temp = operaciones[index];
                 operaciones[index] = operaciones[index - 1];
@@ -1130,15 +1125,9 @@
 
             recalcularLotesMotor();
             guardarDatos();
-            
-            // Forzamos el redibujado inmediato del DOM para que veas el cambio en la tarjeta
             actualizarDashboard();
-            filtrarHistorial();
-            
-            mostrarToast("✓ Operación movida con éxito.");
+            mostrarToast("✓ Orden actualizado. Recalculando...");
         }
-
-
         
         function recalcularLotesMotor() {
             let lotesActivos = [];
@@ -1413,7 +1402,7 @@
                 const inicialUser = (op.usuario || 'U').charAt(0).toUpperCase();
 
                 let loteBadgeHtml = '';
-                if (esVenta && op.loteObj) {
+                if (esVenta && op.loteObj4) {
                     if (op.loteObj.estado === 'CERRADO') {
                         loteBadgeHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span style="color: var(--accent-green); font-size: 0.75rem; font-weight: bold;">● Cerrado</span>`;
                     } else {
