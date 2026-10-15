@@ -6,185 +6,84 @@
     <title>Syklo-Tracker</title>
     <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d1117">
+<link rel="icon" type="image/png" href="icon-192.png">
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<style>
+  /* Aquí ya tienes tus estilos anteriores... */
 
-    <style>
-        :root {
-            --bg-color: #0b0e14;
-            --card-bg: #121721;
-            --card-border: #1e2638;
-            --text-color: #e2e8f0;
-            --text-muted: #8492a6;
-            --accent-green: #00e676;
-            --accent-red: #ff5252;
-            --accent-orange: #ff9100;
-            --accent-purple: #b388ff;
-            --primary-blue: #2979ff;
-            --neon-blue: #38bdf8;
-        }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: 14px;
-            padding-bottom: 95px;
-        }
-        
-        .view-section { display: none; }
-        .view-section.active { display: block; }
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    /* ... */
+  }
 
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #fff;
-        }
-        .user-icon {
-            width: 30px; height: 30px; background: #1e293b; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #94a3b8;
-        }
-        .date-btn {
-            background: rgba(41, 121, 255, 0.1); border: 1px solid rgba(41, 121, 255, 0.3);
-            color: var(--neon-blue); padding: 6px 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; gap: 6px;
-        }
-        #input-fecha-calendario {
-            position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;
-        }
+  /* ========================================== */
+  /* PEGA AQUÍ LOS NUEVOS ESTILOS MODERNOS       */
+  /* ========================================== */
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #0b0e14;
+    color: #e6edf3;
+  }
 
-        .neon-card {
-            background-color: var(--card-bg); border: 1px solid var(--card-border);
-            border-top: 2px solid var(--neon-blue); border-radius: 14px; padding: 16px;
-            margin-bottom: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden; cursor: pointer;
-        }
+  .card, .container, #loginDiv, .dashboard-card {
+    background: rgba(22, 27, 34, 0.85) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
 
-        .ganancia-title {
-            font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase;
-            letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; margin-bottom: 6px;
-        }
-        .val-usdc-main { font-size: 1.6rem; font-weight: 800; color: var(--accent-green); text-align: center; }
-        .val-ves-sub { font-size: 1rem; font-weight: 700; color: var(--text-color); text-align: center; margin-top: 2px; }
+  input[type="text"], input[type="password"], input[type="number"], select {
+    background-color: #161b22 !important;
+    border: 1px solid #30363d !important;
+    color: #f0f6fc !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    font-size: 15px !important;
+    transition: all 0.25s ease-in-out;
+  }
 
-        .progress-bar-container {
-            width: 100%; background-color: #1a2232; border-radius: 8px; height: 8px; margin-top: 12px; overflow: hidden; border: 1px solid var(--card-border);
-        }
-        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #238636, #00e676); width: 0%; transition: width 0.4s ease; }
-        .progress-text { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+  input:focus, select:focus {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+    outline: none !important;
+  }
 
-        .crypto-usd-container { display: flex; justify-content: space-around; align-items: center; margin-top: 6px; }
-        .crypto-item { text-align: center; }
-        .val-crypto-orange { font-size: 1.45rem; font-weight: 800; color: var(--accent-orange); }
-        .val-usd-purple { font-size: 1.45rem; font-weight: 800; color: var(--accent-purple); }
-        .label-unit { font-size: 0.9rem; font-weight: 700; margin-left: 2px; }
+  button, .btn {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    padding: 12px 20px !important;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 14px 0 rgba(2, 132, 199, 0.39) !important;
+    transition: all 0.2s ease-in-out !important;
+  }
 
-        .meta-card-row {
-            background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-        }
+  button:hover, .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px 0 rgba(2, 132, 199, 0.5) !important;
+  }
 
-        .metrics-grid-2x3 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        .metric-card-item {
-            background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; min-height: 70px;
-        }
-        .metric-title { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; z-index: 2; }
-        .metric-value { font-size: 1.15rem; font-weight: 800; color: #fff; z-index: 2; }
-        .metric-big-icon { position: absolute; right: -8px; bottom: -10px; font-size: 3.2rem; opacity: 0.12; z-index: 1; pointer-events: none; user-select: none; }
+  button:active, .btn:active {
+    transform: translateY(1px);
+  }
+  /* ========================================== */
 
-        .btn-analisis {
-            background-color: var(--card-bg); border: 1px solid var(--card-border); border-top: 1px solid rgba(41, 121, 255, 0.4);
-            color: var(--neon-blue); width: 100%; padding: 13px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+</style>
 
-        .fab {
-            position: fixed; bottom: 74px; right: 18px; background: linear-gradient(135deg, #2979ff, #00b0ff);
-            color: white; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 28px;
-            box-shadow: 0 6px 16px rgba(0, 176, 255, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100;
-        }
+    
 
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; background-color: #0c1017; border-top: 1px solid var(--card-border);
-            display: flex; justify-content: space-around; padding: 8px 0 10px 0; z-index: 90;
-        }
-        .nav-item {
-            background: none; border: none; color: #64748b; font-size: 0.72rem; text-align: center; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 3px;
-        }
-        .nav-item.active { color: var(--neon-blue); font-weight: 700; }
-        .nav-item span { font-size: 1.15rem; }
-
-        .filter-bar { background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; margin-bottom: 12px; }
-        .filter-bar input, .filter-bar select, .modal input, .modal select {
-            width: 100%; padding: 9px; background-color: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; color: white; box-sizing: border-box; font-size: 0.85rem; margin-top: 4px;
-        }
-
-        .op-card-item {
-            background-color: #121722; border: 1px solid var(--card-border); border-radius: 14px; padding: 14px; margin-bottom: 12px; cursor: pointer; position: relative;
-        }
-        .op-card-item.type-venta { border-left: 4px solid var(--accent-red); }
-        .op-card-item.type-compra { border-left: 4px solid var(--accent-green); }
-
-        .avatar-circle {
-            width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #fff;
-        }
-        .avatar-venta { background-color: rgba(255, 82, 82, 0.2); border: 1px solid var(--accent-red); color: var(--accent-red); }
-        .avatar-compra { background-color: rgba(0, 230, 118, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); }
-
-        .tag-tipo { font-size: 0.7rem; font-weight: 800; padding: 3px 10px; border-radius: 12px; letter-spacing: 0.5px; }
-        .tag-venta { background-color: rgba(255, 82, 82, 0.15); color: var(--accent-red); }
-        .tag-compra { background-color: rgba(0, 230, 118, 0.15); color: var(--accent-green); }
-
-        .op-grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; margin-bottom: 8px; }
-        .op-grid-col-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
-        .op-grid-col-val { font-size: 1.05rem; font-weight: 800; color: #fff; margin-top: 2px; }
-
-        .ganancia-val-green { font-size: 1.05rem; font-weight: 800; color: var(--accent-green); margin-top: 2px; }
-        .ganancia-sub-usdc { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
-
-        .status-pill {
-            display: inline-flex; align-items: center; gap: 4px; background: rgba(0, 230, 118, 0.1); border: 1px solid rgba(0, 230, 118, 0.3);
-            color: var(--accent-green); padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;
-        }
-
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.85); justify-content: center; align-items: flex-end; z-index: 1000;
-        }
-        .modal-content {
-            background-color: #121722; width: 100%; max-width: 500px; border-top-left-radius: 20px; border-top-right-radius: 20px;
-            padding: 20px; border-top: 1px solid var(--card-border); box-sizing: border-box; max-height: 90vh; overflow-y: auto;
-        }
-        .btn-modal-close {
-            background: #1e2638; border: none; color: #8492a6; width: 28px; height: 28px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 0.9rem; cursor: pointer;
-        }
-        .btn-submit {
-            background: linear-gradient(135deg, #2979ff, #00b0ff); color: white; border: none; width: 100%; padding: 13px;
-            border-radius: 8px; font-weight: 700; font-size: 1rem; margin-top: 10px; cursor: pointer;
-        }
-        .btn-pegado {
-            background-color: #1a2232; border: 1px solid var(--card-border); color: #c9d1d9; width: 100%; padding: 12px;
-            border-radius: 8px; font-size: 0.9rem; margin-top: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-        }
-
-        #toast-aviso {
-            position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background-color: var(--accent-green); color: #000; padding: 10px 20px; border-radius: 30px;
-            font-size: 0.85rem; font-weight: 800; box-shadow: 0 4px 15px rgba(0,230,118,0.4); transition: transform 0.3s ease; z-index: 3000;
-        }
-        #toast-aviso.show { transform: translateX(-50%) translateY(0); }
-    </style>
 </head>
 <body>
 
