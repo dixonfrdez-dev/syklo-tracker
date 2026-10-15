@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Syklo-Tracker</title>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d1117">
-
+    <title>DashSY</title>
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -1175,54 +1173,6 @@
                             let gUsdc = gVes / lote.tasaVenta;
 
                             if (lote.operacionVentaRef) {
-        function recalcularLotesMotor() {
-            let lotesActivos = [];
-            let contadorLote = 1;
-            
-            operaciones.forEach(op => {
-                op.gananciaVes = 0;
-                op.gananciaCripto = 0;
-                op.loteTag = '';
-                op.loteObj = null;
-                op.lotesConsumidos = [];
-            });
-
-            // Ordenar cronológicamente estrictamente por fecha y ID (del más antiguo al más nuevo)
-            const opsCronologico = [...operaciones].sort((a, b) => {
-                if (a.fecha === b.fecha) return a.id - b.id;
-                return a.fecha.localeCompare(b.fecha);
-            });
-
-            opsCronologico.forEach(op => {
-                const tipoUpper = (op.tipo || '').toUpperCase();
-                if (tipoUpper === 'VENTA') {
-                    const nuevoLote = {
-                        idTag: 'L' + contadorLote,
-                        tasaVenta: op.tasa,
-                        montoInicial: op.monto,
-                        montoRestante: op.monto,
-                        estado: 'ABIERTO',
-                        fecha: op.fecha,
-                        operacionVentaRef: op,
-                        consumos: []
-                    };
-                    contadorLote++;
-                    lotesActivos.push(nuevoLote);
-                    op.loteObj = nuevoLote;
-                    op.loteTag = nuevoLote.idTag;
-                } else if (tipoUpper === 'COMPRA') {
-                    let montoPorCubrir = op.monto;
-                    let descLotes = [];
-                    let consumosCompra = [];
-
-                    for (let lote of lotesActivos) {
-                        if (lote.estado === 'ABIERTO' && montoPorCubrir > 0) {
-                            let asignado = Math.min(lote.montoRestante, montoPorCubrir);
-                            let difTasa = lote.tasaVenta - op.tasa;
-                            let gVes = difTasa * asignado;
-                            let gUsdc = gVes / lote.tasaVenta;
-
-                            if (lote.operacionVentaRef) {
                                 lote.operacionVentaRef.gananciaVes = (lote.operacionVentaRef.gananciaVes || 0) + gVes;
                                 lote.operacionVentaRef.gananciaCripto = (lote.operacionVentaRef.gananciaCripto || 0) + gUsdc;
                             }
@@ -1231,7 +1181,7 @@
                             montoPorCubrir -= asignado;
 
                             descLotes.push(`${lote.idTag}(${asignado.toFixed(2)})`);
-                            consumosCompra.push({ loteTag: lote.idTag, monto: asignado, fecha: op.fecha });
+                            consumosCompra.push({ loteTag: lote.idTag, monto: asignado });
                             lote.consumos.push({ 
                                 usuarioCompra: op.usuario, 
                                 monto: asignado, 
@@ -1253,7 +1203,6 @@
             lotes = lotesActivos;
             actualizarRatings();
         }
-
 
         function actualizarDashboard() {
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
@@ -1454,7 +1403,6 @@
 
                 let loteBadgeHtml = '';
                 if (esVenta && op.loteObj) {
-
                     if (op.loteObj.estado === 'CERRADO') {
                         loteBadgeHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span style="color: var(--accent-green); font-size: 0.75rem; font-weight: bold;">● Cerrado</span>`;
                     } else {
@@ -1725,32 +1673,25 @@
             }
         }
 
-            function cargarDatosNube() {
-      if (!usuarioActualId) return;
-      db.collection("usuarios_datos").doc(usuarioActualId).get().then((doc) => {
-        if (doc.exists) {
-          const data = doc.data();
-          operaciones = data.operaciones || [];
-          capitalInicial = data.capitalInicial || 0;
-        } else {
-          operaciones = [];
-          capitalInicial = 0;
+        function cargarDatosNube() {
+            if (!usuarioActualId) return;
+            db.collection("usuarios_datos").doc(usuarioActualId).get().then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    operaciones = data.operaciones || [];
+                    capitalInicial = data.capitalInicial || 0;
+                    const txtCapital = document.getElementById('txt-capital');
+                    if(capitalInicial > 0 && txtCapital) txtCapital.innerText = capitalInicial + " VES registrado";
+                } else {
+                    operaciones = [];
+                    capitalInicial = 0;
+                }
+                recalcularLotesMotor();
+                actualizarDashboard();
+            }).catch((e) => {
+                console.error("Error al cargar de la nube", e);
+            });
         }
-        recalcularLotesMotor();
-        actualizarDashboard();
-      }).catch((e) => {
-        console.error("Error al cargar de la nube:", e);
-      });
-    }
-  </script>
-
-  
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('Service Worker registrado', reg))
-        .catch(err => console.error('Error al registrar Service Worker', err));
-    }
-  </script>
+    </script>
 </body>
 </html>
