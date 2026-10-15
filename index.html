@@ -1307,8 +1307,7 @@
             document.getElementById('pend-reventa-monto').innerText = totalReventa.toFixed(2) + " USDC";
 
             document.getElementById('lista-recompra-pendientes').innerHTML = lotesAbiertos.length > 0 ? 
-                lotesAbiertos.map(l => `<div onclick="verTasaSinPérdida(${l.tasaVenta}, '${l.idTag}')" style="cursor: pointer; ...">Lote ${l.idTag} ...
-
+                lotesAbiertos.map(l => `<div>• Lote ${l.idTag} - Falta recomprar: <b>${l.montoRestante.toFixed(2)} USDC</b></div>`).join('') : 
                 'No hay recompra pendiente.';
 
             const reventaPendienteOps = opsDelDia.filter(op => op.estatus === 'En Curso' && (op.tipo || '').toUpperCase() === 'VENTA');
@@ -1650,14 +1649,6 @@
                 actualizarDashboard();
             }
         }
-function verTasaSinPérdida(tasaVenta, idLote) {
-  const tasaMaxima = parseFloat(tasaVenta) || 0;
-  if (tasaMaxima === 0) {
-    alert("Este lote no tiene una tasa de venta registrada.");
-    return;
-  }
-  alert(`📊 Lote #${idLote}\n\nTasa máxima de recompra sin pérdida: ${tasaMaxima.toLocaleString()}\n(Recomprar por debajo de esta tasa generará ganancia).`);
-}
 
         function guardarDatos() {
             if (!usuarioActualId) return;
