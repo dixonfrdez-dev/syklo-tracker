@@ -1175,6 +1175,54 @@
                             let gUsdc = gVes / lote.tasaVenta;
 
                             if (lote.operacionVentaRef) {
+        function recalcularLotesMotor() {
+            let lotesActivos = [];
+            let contadorLote = 1;
+            
+            operaciones.forEach(op => {
+                op.gananciaVes = 0;
+                op.gananciaCripto = 0;
+                op.loteTag = '';
+                op.loteObj = null;
+                op.lotesConsumidos = [];
+            });
+
+            // Ordenar cronológicamente estrictamente por fecha y ID (del más antiguo al más nuevo)
+            const opsCronologico = [...operaciones].sort((a, b) => {
+                if (a.fecha === b.fecha) return a.id - b.id;
+                return a.fecha.localeCompare(b.fecha);
+            });
+
+            opsCronologico.forEach(op => {
+                const tipoUpper = (op.tipo || '').toUpperCase();
+                if (tipoUpper === 'VENTA') {
+                    const nuevoLote = {
+                        idTag: 'L' + contadorLote,
+                        tasaVenta: op.tasa,
+                        montoInicial: op.monto,
+                        montoRestante: op.monto,
+                        estado: 'ABIERTO',
+                        fecha: op.fecha,
+                        operacionVentaRef: op,
+                        consumos: []
+                    };
+                    contadorLote++;
+                    lotesActivos.push(nuevoLote);
+                    op.loteObj = nuevoLote;
+                    op.loteTag = nuevoLote.idTag;
+                } else if (tipoUpper === 'COMPRA') {
+                    let montoPorCubrir = op.monto;
+                    let descLotes = [];
+                    let consumosCompra = [];
+
+                    for (let lote of lotesActivos) {
+                        if (lote.estado === 'ABIERTO' && montoPorCubrir > 0) {
+                            let asignado = Math.min(lote.montoRestante, montoPorCubrir);
+                            let difTasa = lote.tasaVenta - op.tasa;
+                            let gVes = difTasa * asignado;
+                            let gUsdc = gVes / lote.tasaVenta;
+
+                            if (lote.operacionVentaRef) {
                                 lote.operacionVentaRef.gananciaVes = (lote.operacionVentaRef.gananciaVes || 0) + gVes;
                                 lote.operacionVentaRef.gananciaCripto = (lote.operacionVentaRef.gananciaCripto || 0) + gUsdc;
                             }
@@ -1183,7 +1231,7 @@
                             montoPorCubrir -= asignado;
 
                             descLotes.push(`${lote.idTag}(${asignado.toFixed(2)})`);
-                            consumosCompra.push({ loteTag: lote.idTag, monto: asignado });
+                            consumosCompra.push({ loteTag: lote.idTag, monto: asignado, fecha: op.fecha });
                             lote.consumos.push({ 
                                 usuarioCompra: op.usuario, 
                                 monto: asignado, 
@@ -1205,6 +1253,7 @@
             lotes = lotesActivos;
             actualizarRatings();
         }
+
 
         function actualizarDashboard() {
             const opsDelDia = operaciones.filter(op => op.fecha === fechaActualStr);
@@ -1404,7 +1453,8 @@
                 const inicialUser = (op.usuario || 'U').charAt(0).toUpperCase();
 
                 let loteBadgeHtml = '';
-                if (esVenta && op.loteObj4) {
+                if (esVenta && op.loteObj) {
+
                     if (op.loteObj.estado === 'CERRADO') {
                         loteBadgeHtml = `Lote <span style="color: var(--neon-blue); font-weight: bold;">${op.loteTag}</span> <span style="color: var(--accent-green); font-size: 0.75rem; font-weight: bold;">● Cerrado</span>`;
                     } else {
