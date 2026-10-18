@@ -1307,8 +1307,8 @@
             document.getElementById('pend-reventa-monto').innerText = totalReventa.toFixed(2) + " USDC";
 
             document.getElementById('lista-recompra-pendientes').innerHTML = lotesAbiertos.length > 0 ? 
-                lotesAbiertos.map(l => `<div>• Lote ${l.idTag} - Falta recomprar: <b>${l.montoRestante.toFixed(2)} USDC</b></div>`).join('') : 
-                'No hay recompra pendiente.';
+                lotesAbiertos.map(l => `<div onclick="verTasaSinPérdida(${l.tasaVenta}, '${l.idTag}')" style="cursor: pointer; padding: 6px; margin-bottom: 4px; background: rgba(255,255,255,0.05); border-radius: 6px;">• Lote ${l.idTag}</div>`).join('') || 'No hay recompra pendiente.';
+
 
             const reventaPendienteOps = opsDelDia.filter(op => op.estatus === 'En Curso' && (op.tipo || '').toUpperCase() === 'VENTA');
             
