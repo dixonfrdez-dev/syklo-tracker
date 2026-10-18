@@ -1694,6 +1694,18 @@
         console.error("Error al cargar de la nube:", e);
       });
     }
+
+        // Función para mostrar notificaciones flotantes elegantes tipo toast en lugar de alert()
+function mostrarToast(mensaje) {
+  const toast = document.getElementById('toast-aviso');
+  if (!toast) return;
+  toast.innerText = mensaje;
+  toast.style.display = 'block';
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 3000);
+}
+
   </script>
 
   <!-- Service Worker para la PWA -->
